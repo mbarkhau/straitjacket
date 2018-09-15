@@ -1,0 +1,7 @@
+wheel
+pip
+twine
+ipython
+pudb
+py-spy
+snakeviz
