@@ -1,7 +1,7 @@
 StraitJacket: Another Uncompromising Code Formatter
 ===================================================
 
-StraitJacket is a very simple versioning system,
+At this point StraitJacket just a clone of black, with some extra formatting for code alignment.
 
 .. start-badges
 
@@ -9,7 +9,9 @@ StraitJacket is a very simple versioning system,
     :stub-columns: 1
 
     * - package
-      - | |license| |wheel| |pyversions| |pypi| |version|
+      - | |license| |wheel|
+    * - version
+      - | |pyversions| |pypi| |version|
     * - tests
       - | |travis| |mypy| |coverage|
 
@@ -17,7 +19,7 @@ StraitJacket is a very simple versioning system,
     :target: https://travis-ci.org/mbarkhau/straitjacket
     :alt: Build Status
 
-.. |mypy| image:: http://www.mypy-lang.org/static/mypy_badge.svg
+.. |mypy| image:: https://img.shields.io/badge/mypy-100%25-green.svg
     :target: http://mypy-lang.org/
     :alt: Checked with mypy
 

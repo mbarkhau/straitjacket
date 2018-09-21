@@ -6,7 +6,9 @@
 
 import sys
 
+import black
 from . import sjfmt
 
 if __name__ == '__main__':
+    black.patch_click()
     sys.exit(sjfmt.main())

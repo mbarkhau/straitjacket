@@ -4,8 +4,8 @@
 	build doc run upload
 
 
-LIB_NAME = "straitjacket"
-LIB_SRC_PATH = "src/$(LIB_NAME)/"
+LIB_NAME = straitjacket
+LIB_SRC_PATH = src/$(LIB_NAME)/
 
 
 build/.setup_conda_envs.make_marker:
@@ -40,7 +40,7 @@ build/.install.make_marker: setup.py build/envs.txt requirements*.txt
 		$$(cat requirements-test.txt) \
 		$$(cat requirements-dev.txt);
 
-	$(PYTHON37) -m pip install --upgrade \
+	$(PYTHON36) -m pip install --upgrade \
 		$$(cat requirements-test.txt) \
 		$$(cat requirements-dev.txt);
 
