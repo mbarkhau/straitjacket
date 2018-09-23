@@ -9,8 +9,8 @@ import re
 import sys
 import pathlib as pl
 
-from enum import Enum
-from typing import *
+import enum
+import typing as typ
 
 import black
 
@@ -133,7 +133,7 @@ SYMBOL_STRING_RE = re.compile(r"\"\w+(\w\d)?\"")
 NON_SYMBOL_STRING_RE = re.compile(r"[^a-zA-Z_0-9]")
 
 
-class TokenType(Enum):
+class TokenType(enum.Enum):
 
     INDENT     = 0
     SEPARATOR  = 1
@@ -147,13 +147,13 @@ class TokenType(Enum):
 TokenVal = str
 
 
-class Token(NamedTuple):
+class Token(typ.NamedTuple):
 
     typ: TokenType
     val: TokenVal
 
 
-def tokenize_for_alignment(src_contents: str) -> Iterator[Token]:
+def tokenize_for_alignment(src_contents: str) -> typ.Iterator[Token]:
     rest      = src_contents
     prev_rest = None
 
@@ -241,10 +241,10 @@ Indent      = str
 RowIndex    = int
 ColIndex    = int
 OffsetWidth = int
-TokenTable  = List[List[Token]]
+TokenTable  = typ.List[typ.List[Token]]
 
 
-class RowLayoutToken(NamedTuple):
+class RowLayoutToken(typ.NamedTuple):
     """Disambiguate between lines with different layout/structure
 
     We only want to align lines which have the same structure of
@@ -255,17 +255,17 @@ class RowLayoutToken(NamedTuple):
     typ: TokenType
     # val is only set if it should cause a different prefix
     # eg. if a separator is a comma vs a period.
-    val: Optional[TokenVal]
+    val: typ.Optional[TokenVal]
 
 
 # Tokens which have values which are relevant to to the layout of
 # a cell group.
 LAYOUT_VAL_TOKENS = set([TokenType.SEPARATOR, TokenType.INDENT])
 
-RowLayoutTokens = Tuple[RowLayoutToken, ...]
+RowLayoutTokens = typ.Tuple[RowLayoutToken, ...]
 
 
-class AlignmentContextKey(NamedTuple):
+class AlignmentContextKey(typ.NamedTuple):
     """Does not change between multiple lines that can be aligned."""
 
     col_idx: ColIndex
@@ -274,22 +274,22 @@ class AlignmentContextKey(NamedTuple):
     layout : RowLayoutTokens
 
 
-AlignmentContext = Dict[AlignmentContextKey, OffsetWidth]
+AlignmentContext = typ.Dict[AlignmentContextKey, OffsetWidth]
 
 
-class AlignmentCellKey(NamedTuple):
+class AlignmentCellKey(typ.NamedTuple):
     last_row_index: RowIndex
     col_index     : ColIndex
     token_val     : TokenVal
     layout        : RowLayoutTokens
 
 
-class AlignmentCell(NamedTuple):
+class AlignmentCell(typ.NamedTuple):
     row_idx     : RowIndex
     offset_width: OffsetWidth
 
 
-CellGroups = Dict[AlignmentCellKey, List[AlignmentCell]]
+CellGroups = typ.Dict[AlignmentCellKey, typ.List[AlignmentCell]]
 
 
 def normalize_strings(row: typ.List[Token]) -> None:
@@ -368,26 +368,26 @@ def normalize_strings(row: typ.List[Token]) -> None:
             row[col_index] = Token(TokenType.BLOCK, normalized_token_val)
 
 
-def find_alignment_contexts(table: TokenTable) -> Iterator[AlignmentContext]:
-    is_alignment_enabled = True
+def find_alignment_contexts(table: TokenTable) -> typ.Iterator[AlignmentContext]:
+    is_fmt_enabled = True
 
     for row in table:
         ctx   : AlignmentContext = {}
         layout: RowLayoutTokens  = tuple()
 
-        if is_alignment_enabled:
+        if is_fmt_enabled:
             normalize_strings(row)
 
         for col_index, token in enumerate(row):
             if token.typ == TokenType.COMMENT and "fmt: off" in token.val:
-                is_alignment_enabled = False
+                is_fmt_enabled = False
             if token.typ == TokenType.COMMENT and "fmt: on" in token.val:
-                is_alignment_enabled = True
+                is_fmt_enabled = True
 
-            if not is_alignment_enabled:
+            if not is_fmt_enabled:
                 continue
 
-            layout_token_val: Optional[TokenVal]
+            layout_token_val: typ.Optional[TokenVal]
             if token.typ in LAYOUT_VAL_TOKENS:
                 if token.typ == TokenType.INDENT:
                     layout_token_val = token.val
@@ -418,8 +418,8 @@ def find_alignment_contexts(table: TokenTable) -> Iterator[AlignmentContext]:
         yield ctx
 
 
-def find_cell_groups(alignment_contexts: List[AlignmentContext]) -> CellGroups:
-    cell_groups: Dict[AlignmentCellKey, List[AlignmentCell]] = {}
+def find_cell_groups(alignment_contexts: typ.List[AlignmentContext]) -> CellGroups:
+    cell_groups: typ.Dict[AlignmentCellKey, typ.List[AlignmentCell]] = {}
     for row_index, ctx in enumerate(alignment_contexts):
         ctx_items = sorted(ctx.items())
         for ctx_key, offset_width in ctx_items:
