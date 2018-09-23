@@ -128,8 +128,9 @@ TOKEN_SEP_PATTERN = r"""
 
 TOKEN_SEP_RE = re.compile(TOKEN_SEP_PATTERN, flags=re.MULTILINE | re.VERBOSE)
 
-
 SYMBOL_STRING_RE = re.compile(r"\"\w+(\w\d)?\"")
+
+NON_SYMBOL_STRING_RE = re.compile(r"[^a-zA-Z_0-9]")
 
 
 class TokenType(Enum):
@@ -291,8 +292,14 @@ class AlignmentCell(NamedTuple):
 CellGroups = Dict[AlignmentCellKey, List[AlignmentCell]]
 
 
-def normalize_symbol_strings(row: List[Token]) -> None:
-    """Convert doublequotes to single quotes for internal/symbol/atom strings
+def normalize_strings(row: typ.List[Token]) -> None:
+    """Converts string quoting methods
+
+    - Enforces quoting of "text" in double quotes
+    - Enforces quoting of 'symbols' in single quotes
+
+    Text/Data/Paths are considered to be anything which contains
+    whitespace, punctuation or non ascii characters.
 
     Internal/Symbol/Atom strings are strings which are code as opposed
     to data. They have no meaning outside of the context of the
@@ -309,8 +316,8 @@ def normalize_symbol_strings(row: List[Token]) -> None:
         - format strings
 
     This function performs conversion only for a subset of cases,
-    since it cannot detect all. These cases are, strings used as
-    dictionary keys and for attribute access via getattr,
+    since it cannot detect all. For symbols these cases are, strings
+    used as dictionary keys and for attribute access via getattr,
     setattr, delattr.
     """
 
@@ -346,6 +353,20 @@ def normalize_symbol_strings(row: List[Token]) -> None:
             normalized_token_val = row[col_index + 5].val.replace('"', "'")
             row[col_index + 5] = Token(TokenType.BLOCK, normalized_token_val)
 
+    # double quotes.
+    for col_index, tok_cell in enumerate(row):
+        is_single_quoted_non_symbol = (
+            tok_cell.typ == TokenType.BLOCK
+            and len(tok_cell.val) > 2
+            and tok_cell.val[0] == "'"
+            and tok_cell.val[-1] == "'"
+            and '"' not in tok_cell.val[1:-1]
+            and bool(NON_SYMBOL_STRING_RE.search(tok_cell.val[1:-1]))
+        )
+        if is_single_quoted_non_symbol:
+            normalized_token_val = '"' + tok_cell.val[1:-1] + '"'
+            row[col_index] = Token(TokenType.BLOCK, normalized_token_val)
+
 
 def find_alignment_contexts(table: TokenTable) -> Iterator[AlignmentContext]:
     is_alignment_enabled = True
@@ -355,7 +376,7 @@ def find_alignment_contexts(table: TokenTable) -> Iterator[AlignmentContext]:
         layout: RowLayoutTokens  = tuple()
 
         if is_alignment_enabled:
-            normalize_symbol_strings(row)
+            normalize_strings(row)
 
         for col_index, token in enumerate(row):
             if token.typ == TokenType.COMMENT and "fmt: off" in token.val:

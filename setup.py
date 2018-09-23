@@ -35,10 +35,10 @@ setuptools.setup(
     packages=["straitjacket"],
     package_dir={"": "src"},
     install_requires=["black"],
-    entry_points='''
+    entry_points="""
         [console_scripts]
         sjfmt=straitjacket.sjfmt:main
-    ''',
+    """,
     python_requires=">=3.6",
     zip_safe=True,
     classifiers=[
