@@ -153,7 +153,10 @@ class Token(typ.NamedTuple):
     val: TokenVal
 
 
-def tokenize_for_alignment(src_contents: str) -> typ.Iterator[Token]:
+TokenRow = typ.List[Token]
+
+
+def _tokenize_for_alignment(src_contents: str) -> typ.Iterator[Token]:
     rest      = src_contents
     prev_rest = None
 
@@ -241,7 +244,7 @@ Indent      = str
 RowIndex    = int
 ColIndex    = int
 OffsetWidth = int
-TokenTable  = typ.List[typ.List[Token]]
+TokenTable  = typ.List[TokenRow]
 
 
 class RowLayoutToken(typ.NamedTuple):
@@ -292,8 +295,50 @@ class AlignmentCell(typ.NamedTuple):
 CellGroups = typ.Dict[AlignmentCellKey, typ.List[AlignmentCell]]
 
 
-def normalize_strings(row: typ.List[Token]) -> None:
-    """Converts string quoting methods
+def _is_dict_key_symbol_access(col_index: int, tok_cell: Token, row: TokenRow) -> bool:
+    return (
+        tok_cell.typ == TokenType.SEPARATOR
+        and tok_cell.val in (":", "]")
+        and col_index > 0
+        and row[col_index - 1].typ == TokenType.BLOCK
+        and SYMBOL_STRING_RE.match(row[col_index - 1].val)
+    )
+
+
+ATTR_ACCESORS = ('getattr', 'setattr', 'delattr')
+
+
+def _is_attr_symbol_access(col_index: int, tok_cell: Token, row: TokenRow) -> bool:
+    if not (tok_cell.typ == TokenType.CODE and tok_cell.val in ATTR_ACCESORS):
+        return False
+
+    return (
+        col_index + 5 < len(row)
+        and row[col_index + 1].typ == TokenType.SEPARATOR
+        and row[col_index + 1].val == "("
+        and row[col_index + 2].typ == TokenType.CODE
+        and row[col_index + 3].typ == TokenType.SEPARATOR
+        and row[col_index + 3].val == ","
+        and row[col_index + 4].typ == TokenType.WHITESPACE
+        and row[col_index + 4].val == " "
+        and row[col_index + 5].typ == TokenType.BLOCK
+        and SYMBOL_STRING_RE.match(row[col_index + 5].val)
+    )
+
+
+def _is_single_quoted_non_symbol(col_index: int, tok_cell: Token) -> bool:
+    return (
+        tok_cell.typ == TokenType.BLOCK
+        and len(tok_cell.val) > 2
+        and tok_cell.val[0] == "'"
+        and tok_cell.val[-1] == "'"
+        and '"' not in tok_cell.val[1:-1]
+        and bool(NON_SYMBOL_STRING_RE.search(tok_cell.val[1:-1]))
+    )
+
+
+def _normalize_strings(row: TokenRow) -> None:
+    """Apply string quoting rules.
 
     - Enforces quoting of "text" in double quotes
     - Enforces quoting of 'symbols' in single quotes
@@ -323,52 +368,23 @@ def normalize_strings(row: typ.List[Token]) -> None:
 
     # single quotes.
     for col_index, tok_cell in enumerate(row):
-        is_dict_key_symbol = (
-            tok_cell.typ == TokenType.SEPARATOR
-            and tok_cell.val in (":", "]")
-            and col_index > 0
-            and row[col_index - 1].typ == TokenType.BLOCK
-            and SYMBOL_STRING_RE.match(row[col_index - 1].val)
-        )
 
-        if is_dict_key_symbol:
+        if _is_dict_key_symbol_access(col_index, tok_cell, row):
             normalized_token_val = row[col_index - 1].val.replace('"', "'")
             row[col_index - 1] = Token(TokenType.BLOCK, normalized_token_val)
 
-        is_attrname_symbol = (
-            tok_cell.typ == TokenType.CODE
-            and tok_cell.val in ('getattr', 'setattr', 'delattr')
-            and col_index + 5 < len(row)
-            and row[col_index + 1].typ == TokenType.SEPARATOR
-            and row[col_index + 1].val == "("
-            and row[col_index + 2].typ == TokenType.CODE
-            and row[col_index + 3].typ == TokenType.SEPARATOR
-            and row[col_index + 3].val == ","
-            and row[col_index + 4].typ == TokenType.WHITESPACE
-            and row[col_index + 4].val == " "
-            and row[col_index + 5].typ == TokenType.BLOCK
-            and SYMBOL_STRING_RE.match(row[col_index + 5].val)
-        )
-        if is_attrname_symbol:
-            normalized_token_val = row[col_index + 5].val.replace('"', "'")
+        if _is_attr_symbol_access(col_index, tok_cell, row):
+            normalized_token_val = "'" + row[col_index + 5].val[1:-1] + "'"
             row[col_index + 5] = Token(TokenType.BLOCK, normalized_token_val)
 
     # double quotes.
     for col_index, tok_cell in enumerate(row):
-        is_single_quoted_non_symbol = (
-            tok_cell.typ == TokenType.BLOCK
-            and len(tok_cell.val) > 2
-            and tok_cell.val[0] == "'"
-            and tok_cell.val[-1] == "'"
-            and '"' not in tok_cell.val[1:-1]
-            and bool(NON_SYMBOL_STRING_RE.search(tok_cell.val[1:-1]))
-        )
-        if is_single_quoted_non_symbol:
+        if _is_single_quoted_non_symbol(col_index, tok_cell):
             normalized_token_val = '"' + tok_cell.val[1:-1] + '"'
             row[col_index] = Token(TokenType.BLOCK, normalized_token_val)
 
 
-def find_alignment_contexts(table: TokenTable) -> typ.Iterator[AlignmentContext]:
+def _find_alignment_contexts(table: TokenTable) -> typ.Iterator[AlignmentContext]:
     is_fmt_enabled = True
 
     for row in table:
@@ -376,7 +392,7 @@ def find_alignment_contexts(table: TokenTable) -> typ.Iterator[AlignmentContext]
         layout: RowLayoutTokens  = tuple()
 
         if is_fmt_enabled:
-            normalize_strings(row)
+            _normalize_strings(row)
 
         for col_index, token in enumerate(row):
             if token.typ == TokenType.COMMENT and "fmt: off" in token.val:
@@ -418,7 +434,7 @@ def find_alignment_contexts(table: TokenTable) -> typ.Iterator[AlignmentContext]
         yield ctx
 
 
-def find_cell_groups(alignment_contexts: typ.List[AlignmentContext]) -> CellGroups:
+def _find_cell_groups(alignment_contexts: typ.List[AlignmentContext]) -> CellGroups:
     cell_groups: typ.Dict[AlignmentCellKey, typ.List[AlignmentCell]] = {}
     for row_index, ctx in enumerate(alignment_contexts):
         ctx_items = sorted(ctx.items())
@@ -440,7 +456,14 @@ def find_cell_groups(alignment_contexts: typ.List[AlignmentContext]) -> CellGrou
     return cell_groups
 
 
-def realigned_contents(table: TokenTable, cell_groups: CellGroups) -> str:
+def _is_last_sep_token(token: Token, row: TokenRow) -> bool:
+    return all(
+        token.typ in (TokenType.NEWLINE, TokenType.COMMENT, TokenType.WHITESPACE)
+        for token in row[ctx_key.col_index + 1 :]
+    )
+
+
+def _realigned_contents(table: TokenTable, cell_groups: CellGroups) -> str:
     prev_col_index = -1
     for ctx_key, cells in sorted(cell_groups.items()):
         prev_col_index = ctx_key.col_index
@@ -457,14 +480,9 @@ def realigned_contents(table: TokenTable, cell_groups: CellGroups) -> str:
             left_token   = row[ctx_key.col_index - 1]
             maybe_number = left_token.val.strip().replace("_", "")
 
-            is_last_sep_token = all(
-                token.typ in (TokenType.NEWLINE, TokenType.COMMENT, TokenType.WHITESPACE)
-                for token in row[ctx_key.col_index + 1 :]
-            )
-
             if maybe_number.isdigit():
                 padded_left_token_val = " " * extra_offset + left_token.val
-            elif is_last_sep_token:
+            elif _is_last_sep_token():
                 # don't align if this is the last token of the row
                 continue
             else:
@@ -476,9 +494,9 @@ def realigned_contents(table: TokenTable, cell_groups: CellGroups) -> str:
     return "".join("".join(token.val for token in row) for row in table)
 
 
-def align_formatted_str(src_contents: str) -> FileContent:
+def _align_formatted_str(src_contents: str) -> FileContent:
     table: TokenTable = [[]]
-    for token in tokenize_for_alignment(src_contents):
+    for token in _tokenize_for_alignment(src_contents):
         if DEBUG:
             print("TOKEN: ", repr(token.val).ljust(50), token)
         table[-1].append(token)
@@ -495,8 +513,8 @@ def align_formatted_str(src_contents: str) -> FileContent:
                 print(tok_cell, end="\n     ")
             print()
 
-    alignment_contexts = list(find_alignment_contexts(table))
-    cell_groups        = find_cell_groups(alignment_contexts)
+    alignment_contexts = list(_find_alignment_contexts(table))
+    cell_groups        = _find_cell_groups(alignment_contexts)
 
     if DEBUG:
         for cell_key, cells in cell_groups.items():
@@ -505,7 +523,7 @@ def align_formatted_str(src_contents: str) -> FileContent:
                 for all_cell in cells:
                     print("\t\t", all_cell)
 
-    return realigned_contents(table, cell_groups)
+    return _realigned_contents(table, cell_groups)
 
 
 def patch_format_str():
@@ -515,67 +533,11 @@ def patch_format_str():
         src_contents: str, line_length: int, *, mode: black.FileMode = black.FileMode.AUTO_DETECT
     ) -> black.FileContent:
         black_dst_contents = black_format_str(src_contents, line_length, mode=mode)
-        sjfmt_dst_contents = align_formatted_str(black_dst_contents)
+        sjfmt_dst_contents = _align_formatted_str(black_dst_contents)
         return sjfmt_dst_contents
 
     black.format_str = format_str_wrapper
 
-
-# def main(argv=sys.argv[1:]):
-#     logfile = pl.Path(__file__).parent / "debug.log"
-
-#     def log(msg):
-#         logfile.open(mode="a").write(str(msg) + "\n")
-
-#     if len(argv) == 0 or "--help" in argv:
-#         print("TODO: help doc")
-#         return
-
-#     filemode           = black.FileMode.PYTHON36 | black.FileMode.NO_STRING_NORMALIZATION
-#     if "-" in argv:
-#         try:
-#             src, encoding, newline = black.decode_bytes(sys.stdin.buffer.read())
-#             dst = src
-#             log(repr(src_contents))
-#             formatted_contents = black.format_str(src_contents, line_length=100, mode=filemode)
-#             aligned_contents   = align_formatted_str(formatted_contents)
-#             if src_contents == aligned_contents:
-#                 sys.stderr.write("left unchanged\n")
-#                 return
-#             sys.stdout.write(aligned_contents)
-#             sys.stderr.write("reformatted -\r\nAll done!")
-#             return
-#         except Exception as e:
-#             log(e)
-#             raise e
-#     else:
-#         for arg in argv:
-#             path = pl.Path(arg)
-#             if not path.exists():
-#                 continue
-
-#             with path.open(mode="r") as fh:
-#                 src_contents = fh.read()
-
-#             formatted_contents = black.format_str(src_contents, line_length=100, mode=filemode)
-#             aligned_contents   = align_formatted_str(formatted_contents)
-#             if aligned_contents == src_contents:
-#                 continue
-
-#             tmp_file = path.parent / (path.name + ".sjfmt_tmp")
-#             bak_file = path.parent / (path.name + ".sjfmt_bak")
-
-#             if tmp_file.exists():
-#                 tmp_file.unlink()
-#             if bak_file.exists():
-#                 bak_file.unlink()
-
-#             with tmp_file.open(mode="w") as fh:
-#                 fh.write(aligned_contents)
-
-#             path.rename(bak_file)
-#             tmp_file.rename(path)
-#             bak_file.unlink()
 
 patch_format_str()
 main = black.main
