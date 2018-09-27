@@ -456,7 +456,7 @@ def _find_cell_groups(alignment_contexts: typ.List[AlignmentContext]) -> CellGro
     return cell_groups
 
 
-def _is_last_sep_token(row: TokenRow) -> bool:
+def _is_last_sep_token(ctx_key: AlignmentCellKey, row: TokenRow) -> bool:
     return all(
         token.typ in (TokenType.NEWLINE, TokenType.COMMENT, TokenType.WHITESPACE)
         for token in row[ctx_key.col_index + 1 :]
@@ -482,7 +482,7 @@ def _realigned_contents(table: TokenTable, cell_groups: CellGroups) -> str:
 
             if maybe_number.isdigit():
                 padded_left_token_val = " " * extra_offset + left_token.val
-            elif _is_last_sep_token(row):
+            elif _is_last_sep_token(ctx_key, row):
                 # don't align if this is the last token of the row
                 continue
             else:
