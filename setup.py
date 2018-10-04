@@ -17,9 +17,7 @@ def read(filename):
         return fh.read()
 
 
-long_description = "\n\n".join(
-    (read("README.rst"), read("CONTRIBUTING.rst"), read("CHANGELOG.rst"))
-)
+long_description = "\n\n".join((read("README.md"), read("CONTRIBUTING.md"), read("CHANGELOG.md")))
 
 
 setuptools.setup(
@@ -28,16 +26,18 @@ setuptools.setup(
     author="Manuel Barkhau",
     author_email="mbarkhau@gmail.com",
     url="https://github.com/mbarkhau/straitjacket",
-    version="201809.1a0",
+    version="201809.2a0",
     keywords="formatter yapf black pyfmt gofmt",
     description="Another uncompromising code formatter.",
     long_description=long_description,
+    long_description_content_type="text/markdown",
     packages=["straitjacket"],
     package_dir={"": "src"},
-    install_requires=["black"],
+    install_requires=["black[d]>=18.9b0"],
     entry_points="""
         [console_scripts]
         sjfmt=straitjacket.sjfmt:main
+        sjfmtd=straitjacket.sjfmtd:main
     """,
     python_requires=">=3.6",
     zip_safe=True,
