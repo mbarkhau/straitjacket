@@ -128,9 +128,9 @@ TOKEN_SEP_PATTERN = r"""
 
 TOKEN_SEP_RE = re.compile(TOKEN_SEP_PATTERN, flags=re.MULTILINE | re.VERBOSE)
 
-SYMBOL_STRING_RE = re.compile(r"\"\w+(\w\d)?\"")
+SYMBOL_STRING_RE = re.compile(r"\"[a-zA-Z0-9_\-]+\"")
 
-NON_SYMBOL_STRING_RE = re.compile(r"[^a-zA-Z_0-9]")
+NON_SYMBOL_STRING_RE = re.compile(r"[^a-zA-Z0-9_\-]")
 
 
 class TokenType(enum.Enum):
@@ -527,6 +527,9 @@ def _align_formatted_str(src_contents: str) -> FileContent:
 
 
 def patch_format_str():
+    if hasattr(black, '_black_format_str_unpatched'):
+        return
+
     black_format_str = black.format_str
 
     def format_str_wrapper(
@@ -537,10 +540,12 @@ def patch_format_str():
         return sjfmt_dst_contents
 
     black.format_str = format_str_wrapper
+    setattr(black, '_black_format_str_unpatched', black_format_str)
 
 
 patch_format_str()
 main = black.main
+
 
 if __name__ == '__main__':
     black.patch_click()
