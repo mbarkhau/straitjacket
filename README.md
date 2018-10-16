@@ -1,49 +1,43 @@
 # StraitJacket: Another Uncompromising Code Formatter
 
-At this point StraitJacket just a clone of black, with some extra formatting for code alignment.
+StraitJacket is a wrapper around black which implements post
+processing to perform automatic code alignment.
 
-.. start-badges
+[![Code Style: sjfmt][style_img]][style_ref]
+[![Type Checked with mypy][mypy_img]][mypy_ref]
+[![Build Status][ci_build_img]][ci_build_ref]
+[![Code Coverage][codecov_img]][codecov_ref]
+[![MIT License][license_img]][license_ref]
+[![PyCalVer v201810.0004-beta][version_img]][version_ref]
+[![PyPI Version][pypi_img]][pypi_ref]
+[![PyPI Wheel][wheel_img]][wheel_ref]
+[![Supported Python Versions][pyversions_img]][pyversions_ref]
 
-.. list-table::
-    :stub-columns: 1
 
-    * - package
-      - | |license| |wheel|
-    * - version
-      - | |pyversions| |pypi| |version|
-    * - tests
-      - | |travis| |mypy| |coverage|
+[mypy_img]: https://img.shields.io/badge/mypy-100%25-green.svg
+[mypy_ref]: http://mypy-lang.org/
 
-.. |travis| image:: https://api.travis-ci.org/mbarkhau/straitjacket.svg?branch=master
-    :target: https://travis-ci.org/mbarkhau/straitjacket
-    :alt: Build Status
+[style_img]: https://img.shields.io/badge/code%20style-%20sjfmt-f71.svg
+[style_ref]: https://gitlab.com/mbarkhau/straitjacket/
 
-.. |mypy| image:: https://img.shields.io/badge/mypy-100%25-green.svg
-    :target: http://mypy-lang.org/
-    :alt: Checked with mypy
+[ci_build_img]: https://gitlab.com/mbarkhau/straitjacket/badges/master/pipelines.svg
+[ci_build_ref]: https://gitlab.com/mbarkhau/straitjacket/pipelines
 
-.. |coverage| image:: https://codecov.io/gh/mbarkhau/straitjacket/branch/master/graph/badge.svg
-    :target: https://codecov.io/gh/mbarkhau/straitjacket
-    :alt: Code Coverage
+[codecov_img]: https://gitlab.com/mbarkhau/straitjacket/badges/master/coverage.svg
+[codecov_ref]: https://mbarkhau.gitlab.io/straitjacket/cov
 
-.. |license| image:: https://img.shields.io/pypi/l/straitjacket.svg
-    :target: https://github.com/mbarkhau/straitjacket/blob/master/LICENSE
-    :alt: MIT License
+[license_img]: https://img.shields.io/badge/License-MIT-blue.svg
+[license_ref]: https://gitlab.com/mbarkhau/straitjacket/blob/master/LICENSE
 
-.. |pypi| image:: https://img.shields.io/pypi/v/straitjacket.svg
-    :target: https://github.com/mbarkhau/straitjacket/blob/master/CHANGELOG.rst
-    :alt: PyPI Version
+[pypi_img]: https://img.shields.io/pypi/v/straitjacket.svg
+[pypi_ref]: https://gitlab.com/mbarkhau/straitjacket/blob/master/CHANGELOG.rst
 
-.. |version| image:: https://img.shields.io/badge/CalVer-v201809.0002--beta-blue.svg
-    :target: https://calver.org/
-    :alt: CalVer v201809.0001-alpha
+[version_img]: https://img.shields.io/badge/PyCalVer-v201810.0004--beta-blue.svg
+[version_ref]: https://calver.org/
 
-.. |wheel| image:: https://img.shields.io/pypi/wheel/straitjacket.svg
-    :target: https://pypi.org/project/straitjacket/#files
-    :alt: PyPI Wheel
+[wheel_img]: https://img.shields.io/pypi/wheel/straitjacket.svg
+[wheel_ref]: https://pypi.org/project/straitjacket/#files
 
-.. |pyversions| image:: https://img.shields.io/pypi/pyversions/straitjacket.svg
-    :target: https://pypi.python.org/pypi/straitjacket
-    :alt: Supported Python Versions
+[pyversions_img]: https://img.shields.io/pypi/pyversions/straitjacket.svg
+[pyversions_ref]: https://pypi.python.org/pypi/straitjacket
 
-<div>Icons made by <a href="http://www.freepik.com" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
