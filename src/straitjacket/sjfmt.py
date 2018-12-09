@@ -245,7 +245,7 @@ TokenTable  = typ.List[TokenRow]
 
 
 class RowLayoutToken(typ.NamedTuple):
-    """Disambiguate between lines with different layout/structure
+    """Disambiguate between lines with different layout/structure.
 
     We only want to align lines which have the same structure of
     indent and separators. Any difference in the number of elements
@@ -255,12 +255,12 @@ class RowLayoutToken(typ.NamedTuple):
     typ: TokenType
     # val is only set if it should cause a different prefix
     # eg. if a separator is a comma vs a period.
-    val: typ.Optional[TokenVal]
+    val: TokenVal
 
 
 # Tokens which have values which are relevant to to the layout of
 # a cell group.
-LAYOUT_VAL_TOKENS = set([TokenType.SEPARATOR, TokenType.INDENT])
+LAYOUT_VAL_TOKENS = {TokenType.SEPARATOR, TokenType.INDENT}
 
 RowLayoutTokens = typ.Tuple[RowLayoutToken, ...]
 
@@ -386,7 +386,7 @@ def _find_alignment_contexts(table: TokenTable) -> typ.Iterator[AlignmentContext
 
     for row in table:
         ctx   : AlignmentContext = {}
-        layout: RowLayoutTokens  = tuple()
+        layout: RowLayoutTokens  = ()
 
         if is_fmt_enabled:
             _normalize_strings(row)
@@ -400,7 +400,8 @@ def _find_alignment_contexts(table: TokenTable) -> typ.Iterator[AlignmentContext
             if not is_fmt_enabled:
                 continue
 
-            layout_token_val: typ.Optional[TokenVal]
+            layout_token_val: TokenVal = ""
+
             if token.typ in LAYOUT_VAL_TOKENS:
                 if token.typ == TokenType.INDENT:
                     layout_token_val = token.val
@@ -413,10 +414,6 @@ def _find_alignment_contexts(table: TokenTable) -> typ.Iterator[AlignmentContext
                     # want to continue with alignment if the tokens are
                     # all at the same line offset.
                     layout_token_val = token.val + f"::{len(row[col_index - 1].val)}"
-                else:
-                    layout_token_val = None
-            else:
-                layout_token_val = None
 
             layout += (RowLayoutToken(token.typ, layout_token_val),)
 
