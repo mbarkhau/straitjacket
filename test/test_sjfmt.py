@@ -127,6 +127,10 @@ def test_string_quoting():
     assert _fmt("""d = {'text key': 3}    """) == """d = {"text key": 3}  """.strip()
 
 
+def test_backslash():
+    _fmt(r'''x = "\\"   ''') == r'''x = "\\"  '''.strip()
+
+
 def test_fmt_off():
     pass
 
