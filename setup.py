@@ -1,23 +1,31 @@
 # This file is part of the straitjacket project
-# https://github.com/mbarkhau/straitjacket
+# https://gitlab.com/mbarkhau/straitjacket
 #
-# (C) 2018 Manuel Barkhau (mbarkhau@gmail.com)
+# Copyright (c) 2018 Manuel Barkhau (mbarkhau@gmail.com) - MIT License
 # SPDX-License-Identifier: MIT
 
-import pathlib
+import os
 import setuptools
 
 
-def project_path(filename):
-    return (pathlib.Path(__file__).parent / filename).absolute()
+def project_path(*sub_paths):
+    project_dirpath = os.path.abspath(os.path.dirname(__file__))
+    return os.path.join(project_dirpath, *sub_paths)
 
 
-def read(filename):
-    with project_path(filename).open(mode="r") as fh:
-        return fh.read()
+def read(*sub_paths):
+    with open(project_path(*sub_paths), mode="rb") as fh:
+        return fh.read().decode("utf-8")
 
 
-long_description = "\n\n".join((read("README.md"), read("CONTRIBUTING.md"), read("CHANGELOG.md")))
+install_requires = [
+    line.strip()
+    for line in read("requirements", "pypi.txt").splitlines()
+    if line.strip() and not line.startswith("#")
+]
+
+
+long_description = "\n\n".join((read("README.md"), read("CHANGELOG.md")))
 
 
 setuptools.setup(
@@ -25,15 +33,15 @@ setuptools.setup(
     license="MIT",
     author="Manuel Barkhau",
     author_email="mbarkhau@gmail.com",
-    url="https://github.com/mbarkhau/straitjacket",
+    url="https://gitlab.com/mbarkhau/straitjacket",
     version="201810.4a0",
     keywords="formatter yapf black pyfmt gofmt",
-    description="Another uncompromising code formatter.",
+    description="Another Uncompromising Code Formatter for Python.",
     long_description=long_description,
     long_description_content_type="text/markdown",
     packages=["straitjacket"],
     package_dir={"": "src"},
-    install_requires=["black[d]>=18.9b0"],
+    install_requires=install_requires,
     entry_points="""
         [console_scripts]
         sjfmt=straitjacket.sjfmt:main

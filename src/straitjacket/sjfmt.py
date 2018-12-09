@@ -4,10 +4,7 @@
 # (C) 2018 Manuel Barkhau (@mbarkhau)
 # SPDX-License-Identifier: MIT
 
-import os
 import re
-import sys
-import pathlib as pl
 
 import enum
 import typing as typ
@@ -301,7 +298,7 @@ def _is_dict_key_symbol_access(col_index: int, tok_cell: Token, row: TokenRow) -
         and tok_cell.val in (":", "]")
         and col_index > 0
         and row[col_index - 1].typ == TokenType.BLOCK
-        and SYMBOL_STRING_RE.match(row[col_index - 1].val)
+        and bool(SYMBOL_STRING_RE.match(row[col_index - 1].val))
     )
 
 
@@ -322,7 +319,7 @@ def _is_attr_symbol_access(col_index: int, tok_cell: Token, row: TokenRow) -> bo
         and row[col_index + 4].typ == TokenType.WHITESPACE
         and row[col_index + 4].val == " "
         and row[col_index + 5].typ == TokenType.BLOCK
-        and SYMBOL_STRING_RE.match(row[col_index + 5].val)
+        and bool(SYMBOL_STRING_RE.match(row[col_index + 5].val))
     )
 
 
@@ -464,9 +461,9 @@ def _is_last_sep_token(ctx_key: AlignmentCellKey, row: TokenRow) -> bool:
 
 
 def _realigned_contents(table: TokenTable, cell_groups: CellGroups) -> str:
-    prev_col_index = -1
+    # _prev_col_index = -1
     for ctx_key, cells in sorted(cell_groups.items()):
-        prev_col_index = ctx_key.col_index
+        # _prev_col_index = ctx_key.col_index
         if len(cells) < 2:
             continue
 
@@ -526,7 +523,7 @@ def _align_formatted_str(src_contents: str) -> FileContent:
     return _realigned_contents(table, cell_groups)
 
 
-def patch_format_str():
+def patch_format_str() -> None:
     if hasattr(black, '_black_format_str_unpatched'):
         return
 

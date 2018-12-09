@@ -1,0 +1,29 @@
+stages:
+  - test
+  - build
+
+
+unit:
+  stage: test
+  image: registry.gitlab.com/mbarkhau/straitjacket/base
+  script:
+    - make lint
+    - make mypy
+    - make test
+  coverage: '/^(TOTAL|src).*?(\d+\%)$/'
+  artifacts:
+    paths:
+      - htmlcov/
+  allow_failure: false
+
+
+pages:
+  stage: build
+  script:
+    - mkdir -p public/cov
+    - cp htmlcov/* public/cov/
+  artifacts:
+    paths:
+      - public
+  only:
+    - master
