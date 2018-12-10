@@ -167,10 +167,17 @@ def _tokenize_for_alignment(src_contents: str) -> typ.Iterator[Token]:
         curr_token_sep = TOKEN_SEP_RE.search(rest)
         assert curr_token_sep is not None
         curr_token_start, curr_token_end = curr_token_sep.span()
-
+        is_eof = curr_token_start == len(rest)
         # newline match has zero width
         is_newline = curr_token_start == curr_token_end
-        if is_newline:
+
+        if is_eof:
+            if len(prev_token_val.strip()) == 0:
+                yield Token(TokenType.WHITESPACE, rest)
+            else:
+                yield Token(TokenType.CODE, rest)
+            return
+        elif is_newline:
             # adjust for zero width match
             curr_token_end = curr_token_start + 1
 
@@ -298,7 +305,7 @@ CellGroups = typ.Dict[AlignmentCellKey, typ.List[AlignmentCell]]
 def _is_dict_key_symbol_access(col_index: int, tok_cell: Token, row: TokenRow) -> bool:
     return (
         tok_cell.typ == TokenType.SEPARATOR
-        and tok_cell.val in (":", "]")
+        and tok_cell.val in (":", "]", "],", ",")
         and col_index > 0
         and row[col_index - 1].typ == TokenType.BLOCK
         and bool(SYMBOL_STRING_RE.match(row[col_index - 1].val))
@@ -368,7 +375,6 @@ def _normalize_strings(row: TokenRow) -> None:
 
     # single quotes.
     for col_index, tok_cell in enumerate(row):
-
         if _is_dict_key_symbol_access(col_index, tok_cell, row):
             normalized_token_val = row[col_index - 1].val.replace('"', "'")
             row[col_index - 1] = Token(TokenType.BLOCK, normalized_token_val)

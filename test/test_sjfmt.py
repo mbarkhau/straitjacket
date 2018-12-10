@@ -131,6 +131,17 @@ def test_backslash():
     _fmt(r'''x = "\\"   ''') == r'''x = "\\"  '''.strip()
 
 
+def test_symbol_normalization():
+    unfmt = '''d["bar"] = 123'''
+    assert _fmt(unfmt) == '''d['bar'] = 123'''
+
+    unfmt = '''d["foo"], d["bar"] = something.split()'''
+    assert _fmt(unfmt ) == '''d['foo'], d['bar'] = something.split()'''
+
+    unfmt = '''x = ["bar", "baz"]'''
+    assert _fmt(unfmt) == '''x = ['bar', 'baz']'''
+
+
 def test_fmt_off():
     pass
 
