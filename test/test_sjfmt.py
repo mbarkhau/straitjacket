@@ -103,12 +103,11 @@ class TestEnv(myenv.BaseEnv):
 
 
 def _fmt(code: str) -> str:
-    sjfmt.DEBUG = 1
+    sjfmt.DEBUG_LVL = 2
     try:
         return sjfmt._align_formatted_str(code.strip())
     finally:
-        sjfmt.DEBUG = 0
-
+        sjfmt.DEBUG_LVL = 0
 
 def test_string_quoting():
     assert _fmt("""text_ok = "ast }"   """) == """text_ok = "ast }"   """.strip()

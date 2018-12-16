@@ -12,7 +12,7 @@ import typing as typ
 import black
 
 
-DEBUG = 0
+DEBUG_LVL = 0
 
 
 FileContent = str
@@ -151,6 +151,9 @@ class Token(typ.NamedTuple):
 
     typ: TokenType
     val: TokenVal
+
+    def __repr__(self) -> str:
+        return f"{self.typ:<20} {repr(self.val)}"
 
 
 TokenRow = typ.List[Token]
@@ -373,6 +376,9 @@ def _normalize_strings(row: TokenRow) -> None:
     setattr, delattr.
     """
 
+    if len(row) == 1 and row[0].typ == TokenType.NEWLINE:
+        return
+
     # single quotes.
     for col_index, tok_cell in enumerate(row):
         if _is_dict_key_symbol_access(col_index, tok_cell, row):
@@ -481,7 +487,7 @@ def _realigned_contents(table: TokenTable, cell_groups: CellGroups) -> str:
 
             row          = table[row_index]
             left_token   = row[ctx_key.col_index - 1]
-            maybe_number = left_token.val.strip().replace("_", "")
+            maybe_number = left_token.val.strip().replace('_', "")
 
             if maybe_number.isdigit():
                 padded_left_token_val = " " * extra_offset + left_token.val
@@ -500,8 +506,9 @@ def _realigned_contents(table: TokenTable, cell_groups: CellGroups) -> str:
 def _align_formatted_str(src_contents: str) -> FileContent:
     table: TokenTable = [[]]
     for token in _tokenize_for_alignment(src_contents):
-        if DEBUG:
-            print("TOKEN: ", repr(token.val).ljust(50), token)
+        if DEBUG_LVL >= 2:
+            print(f"TOKEN: {token.val:<50} {token}")
+
         table[-1].append(token)
         if token.typ == TokenType.NEWLINE:
             table.append([])
@@ -509,7 +516,7 @@ def _align_formatted_str(src_contents: str) -> FileContent:
             is_block_token = token.typ in (TokenType.BLOCK, TokenType.COMMENT, TokenType.WHITESPACE)
             assert is_block_token or "\n" not in token.val
 
-    if DEBUG:
+    if DEBUG_LVL >= 1:
         for row in table:
             print("ROW: ", end="")
             for tok_cell in row:
@@ -519,10 +526,10 @@ def _align_formatted_str(src_contents: str) -> FileContent:
     alignment_contexts = list(_find_alignment_contexts(table))
     cell_groups        = _find_cell_groups(alignment_contexts)
 
-    if DEBUG:
+    if DEBUG_LVL >= 2:
         for cell_key, cells in cell_groups.items():
             if len(cells) > 1:
-                print("CELL", len(cells), cell_key)
+                print('CELL', len(cells), cell_key)
                 for all_cell in cells:
                     print("\t\t", all_cell)
 
