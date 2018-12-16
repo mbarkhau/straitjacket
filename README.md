@@ -35,6 +35,25 @@ Code Quality/CI:
 
 [](TOC)
 
+## Alignment
+
+Example of automatic alignment.
+
+```python
+class TokenType(enum.Enum):           # class TokenType(enum.Enum):
+
+    INDENT    = 0                     #     INDENT = 0
+    SEPARATOR = 1                     #     SEPARATOR = 1
+    CODE      = 2                     #     CODE = 2
+
+
+Indent      = str                     # Indent = str
+RowIndex    = int                     # RowIndex = int
+ColIndex    = int                     # ColIndex = int
+OffsetWidth = int                     # OffsetWidth = int
+TokenTable  = typ.List[TokenRow]      # TokenTable = typ.List[TokenRow]
+```
+
 
 [repo_ref]: https://gitlab.com/mbarkhau/straitjacket
 
