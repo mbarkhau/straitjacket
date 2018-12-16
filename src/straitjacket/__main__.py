@@ -23,4 +23,5 @@ from . import sjfmt
 
 if __name__ == '__main__':
     black.patch_click()
-    sys.exit(sjfmt.main())
+    sjfmt.main()
+    sys.exit(0)

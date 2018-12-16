@@ -175,7 +175,7 @@ def _tokenize_for_alignment(src_contents: str) -> typ.Iterator[Token]:
         is_newline = curr_token_start == curr_token_end
 
         if is_eof:
-            if len(prev_token_val.strip()) == 0:
+            if prev_token_val and len(prev_token_val.strip()) == 0:
                 yield Token(TokenType.WHITESPACE, rest)
             else:
                 yield Token(TokenType.CODE, rest)
