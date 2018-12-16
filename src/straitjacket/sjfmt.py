@@ -90,12 +90,15 @@ QUOTE_END_PATTERN = r"""
 """
 
 
+COMMENT_END_PATTERN = r"$"
+
+
 NO_ALIGN_BLOCK_END_MATCHERS = {
     "'''": re.compile(TRIPPLE_QUOTE_END_PATTERN       , flags=re.VERBOSE),
     '"""': re.compile(TRIPPLE_DOUBLE_QUOTE_END_PATTERN, flags=re.VERBOSE),
     '"'  : re.compile(DOUBLE_QUOTE_END_PATTERN        , flags=re.VERBOSE),
     "'"  : re.compile(QUOTE_END_PATTERN               , flags=re.VERBOSE),
-    "#"  : re.compile(r"$", flags=re.MULTILINE),
+    "#"  : re.compile(COMMENT_END_PATTERN             , flags=re.MULTILINE),
 }
 
 
@@ -153,15 +156,21 @@ class Token(typ.NamedTuple):
     val: TokenVal
 
     def __repr__(self) -> str:
-        return f"{self.typ:<20} {repr(self.val)}"
+        """Token representation with alignment.
+
+        >>> repr(Token(TokenType.CODE, 'tokenval'))
+        "Token(TokenType.CODE      , 'tokenval')"
+        """
+        return f"Token({self.typ:<20}, {repr(self.val)})"
 
 
 TokenRow = typ.List[Token]
 
 
 def _tokenize_for_alignment(src_contents: str) -> typ.Iterator[Token]:
-    rest      = src_contents
-    prev_rest = None
+    rest           = src_contents
+    prev_rest      = None
+    prev_token_val = None
 
     while rest:
         assert rest != prev_rest, "No progress at: " + repr(rest[:40])
@@ -291,8 +300,8 @@ AlignmentContext = typ.Dict[AlignmentContextKey, OffsetWidth]
 
 
 class AlignmentCellKey(typ.NamedTuple):
-    last_row_index: RowIndex
     col_index     : ColIndex
+    last_row_index: RowIndex
     token_val     : TokenVal
     layout        : RowLayoutTokens
 
@@ -473,9 +482,10 @@ def _find_cell_groups(alignment_contexts: typ.List[AlignmentContext]) -> CellGro
         ctx_items = sorted(ctx.items())
         for ctx_key, offset_width in ctx_items:
             col_index, token_typ, token_val, layout = ctx_key
+            prev_row_idx = row_index - 1
 
-            prev_cell_key = AlignmentCellKey(row_index - 1, col_index, token_val, layout)
-            curr_cell_key = AlignmentCellKey(row_index, col_index, token_val, layout)
+            prev_cell_key = AlignmentCellKey(col_index, prev_row_idx, token_val, layout)
+            curr_cell_key = AlignmentCellKey(col_index, row_index   , token_val, layout)
 
             curr_cell = AlignmentCell(row_index, offset_width)
 
@@ -497,32 +507,48 @@ def _is_last_sep_token(ctx_key: AlignmentCellKey, row: TokenRow) -> bool:
 
 
 def _realigned_contents(table: TokenTable, cell_groups: CellGroups) -> str:
-    # _prev_col_index = -1
     for ctx_key, cells in sorted(cell_groups.items()):
-        # _prev_col_index = ctx_key.col_index
-        if len(cells) < 2:
+        if len(cells) <= 1:
             continue
 
-        max_offset_width = max(ow for _, ow in cells)
-        for row_index, offset_width in cells:
-            extra_offset = max_offset_width - offset_width
+        col_idx = ctx_key.col_index - 1
+
+        max_offset_width = max(cell.offset_width for cell in cells)
+        cell_row_tokens  = [
+            (cell, table[cell.row_idx], table[cell.row_idx][col_idx]) for cell in cells
+        ]
+
+        is_numeric_cell_group = True
+        all_prefix_lens       = set()
+        for _, row, token in cell_row_tokens:
+            maybe_number = token.val.strip().replace('_', "")
+            if not maybe_number.isdigit():
+                is_numeric_cell_group = False
+
+            prefix_lens = [
+                len(token.val) for _prefix_idx, token in enumerate(row) if _prefix_idx < col_idx
+            ]
+            all_prefix_lens.add(sum(prefix_lens))
+
+        if len(all_prefix_lens) > 1:
+            # don't align cell groups with prefixes of different length
+            break
+
+        for cell, row, token in cell_row_tokens:
+            extra_offset = max_offset_width - cell.offset_width
             if extra_offset == 0:
                 continue
 
-            row          = table[row_index]
-            left_token   = row[ctx_key.col_index - 1]
-            maybe_number = left_token.val.strip().replace('_', "")
-
-            if maybe_number.isdigit():
-                padded_left_token_val = " " * extra_offset + left_token.val
+            if is_numeric_cell_group:
+                padded_token_val = " " * extra_offset + token.val
             elif _is_last_sep_token(ctx_key, row):
                 # don't align if this is the last token of the row
                 continue
             else:
-                padded_left_token_val = left_token.val + " " * extra_offset
-            padded_token = Token(TokenType.CODE, padded_left_token_val)
-            padded_token = Token(TokenType.CODE, padded_left_token_val)
-            row[ctx_key.col_index - 1] = padded_token
+                padded_token_val = token.val + " " * extra_offset
+
+            padded_token = Token(TokenType.CODE, padded_token_val)
+            row[col_idx] = padded_token
 
     return "".join("".join(token.val for token in row) for row in table)
 
@@ -551,11 +577,11 @@ def _align_formatted_str(src_contents: str) -> FileContent:
     cell_groups        = _find_cell_groups(alignment_contexts)
 
     if DEBUG_LVL >= 2:
-        for cell_key, cells in cell_groups.items():
+        for cell_key, cells in sorted(cell_groups.items()):
             if len(cells) > 1:
                 print('CELL', len(cells), cell_key)
-                for all_cell in cells:
-                    print("\t\t", all_cell)
+                for _cell in sorted(cells):
+                    print("\t\t", _cell)
 
     return _realigned_contents(table, cell_groups)
 
@@ -569,7 +595,8 @@ def patch_format_str() -> None:
     def format_str_wrapper(
         src_contents: str, line_length: int, *, mode: black.FileMode = black.FileMode.AUTO_DETECT
     ) -> black.FileContent:
-        black_dst_contents = black_format_str(src_contents, line_length, mode=mode)
+        mode |= black.FileMode.NO_STRING_NORMALIZATION
+        black_dst_contents = black_format_str(src_contents, line_length=line_length, mode=mode)
         sjfmt_dst_contents = _align_formatted_str(black_dst_contents)
         return sjfmt_dst_contents
 

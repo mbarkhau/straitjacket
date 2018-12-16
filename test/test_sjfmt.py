@@ -134,29 +134,23 @@ def _fmt(code: str) -> str:
         sjfmt.DEBUG_LVL = 0
 
 
-def test_selftest():
-    with open(__file__) as fh:
-        unfmt = fh.read()
-    assert _fmt(unfmt) == unfmt
-
-
 def test_string_quoting():
-    assert _fmt("""text_ok = "foo }"         """) == """text_ok = "foo }"         """.strip()
-    assert _fmt("""text_nok = 'foo }'        """) == """text_nok = "foo }"        """.strip()
-    assert _fmt("""unchanged = "foo"         """) == """unchanged = "foo"         """.strip()
-    assert _fmt("""unchanged = 'foo'         """) == """unchanged = 'foo'         """.strip()
-    assert _fmt("""unchanged = ("foo", 'bar')""") == """unchanged = ("foo", 'bar')""".strip()
-    assert _fmt("""unchanged = ['foo', "bar"]""") == """unchanged = ['foo', "bar"]""".strip()
+    assert _fmt("""text_ok = "foo }"         """) == _("""text_ok = "foo }"         """)
+    assert _fmt("""text_nok = 'foo }'        """) == _("""text_nok = "foo }"        """)
+    assert _fmt("""unchanged = "foo"         """) == _("""unchanged = "foo"         """)
+    assert _fmt("""unchanged = 'foo'         """) == _("""unchanged = 'foo'         """)
+    assert _fmt("""unchanged = ("foo", 'bar')""") == _("""unchanged = ("foo", 'bar')""")
+    assert _fmt("""unchanged = ['foo', "bar"]""") == _("""unchanged = ['foo', "bar"]""")
 
-    assert _fmt("""d["symbol_key"]  """) == """d['symbol_key']  """.strip()
-    assert _fmt("""d['symbol_key']  """) == """d['symbol_key']  """.strip()
-    assert _fmt("""d["text key"]    """) == """d["text key"]    """.strip()
-    assert _fmt("""d['text key']    """) == """d["text key"]    """.strip()
+    assert _fmt("""d["symbol_key"]  """) == _("""d['symbol_key']  """)
+    assert _fmt("""d['symbol_key']  """) == _("""d['symbol_key']  """)
+    assert _fmt("""d["text key"]    """) == _("""d["text key"]    """)
+    assert _fmt("""d['text key']    """) == _("""d["text key"]    """)
 
-    assert _fmt("""d = {"symbol_key": 3}  """) == """d = {'symbol_key': 3}""".strip()
-    assert _fmt("""d = {'symbol_key': 3}  """) == """d = {'symbol_key': 3}""".strip()
-    assert _fmt("""d = {"text key": 3}    """) == """d = {"text key": 3}  """.strip()
-    assert _fmt("""d = {'text key': 3}    """) == """d = {"text key": 3}  """.strip()
+    assert _fmt("""d = {"symbol_key": 3}  """) == _("""d = {'symbol_key': 3}""")
+    assert _fmt("""d = {'symbol_key': 3}  """) == _("""d = {'symbol_key': 3}""")
+    assert _fmt("""d = {"text key": 3}    """) == _("""d = {"text key": 3}  """)
+    assert _fmt("""d = {'text key': 3}    """) == _("""d = {"text key": 3}  """)
 
 
 def test_backslash():
@@ -164,37 +158,122 @@ def test_backslash():
 
 
 def test_symbol_normalization():
-    unfmt = '''d["bar"] = 123'''
-    assert _fmt(unfmt) == '''d['bar'] = 123'''
+    unfmt    = '''d["bar"] = 123'''
+    expected = _('''d['bar'] = 123''')
+    assert _fmt(unfmt) == expected
 
-    unfmt = '''d["foo"], d["bar"] = something.split()'''
-    assert _fmt(unfmt ) == '''d['foo'], d['bar'] = something.split()'''
+    unfmt    = '''d["foo"], d["bar"] = something.split()'''
+    expected = _('''d['foo'], d['bar'] = something.split()''')
+    assert _fmt(unfmt) == expected
 
-    unfmt = '''x = ["bar", "baz"]'''
-    assert _fmt(unfmt) == '''x = ["bar", "baz"]'''
+    unfmt    = '''x = ["bar", "baz"]'''
+    expected = _('''x = ["bar", "baz"]''')
+    assert _fmt(unfmt) == expected
 
-    unfmt = '''x = ['bar', 'baz']'''
-    assert _fmt(unfmt) == '''x = ['bar', 'baz']'''
+    unfmt    = '''x = ['bar', 'baz']'''
+    expected = _('''x = ['bar', 'baz']''')
+    assert _fmt(unfmt) == expected
 
-    unfmt = '''x = ("bar", "baz")'''
-    assert _fmt(unfmt) == '''x = ("bar", "baz")'''
+    unfmt    = '''x = ("bar", "baz")'''
+    expected = _('''x = ("bar", "baz")''')
+    assert _fmt(unfmt) == expected
 
-    unfmt = '''x = ('bar', 'baz')'''
-    assert _fmt(unfmt) == '''x = ('bar', 'baz')'''
+    unfmt    = '''x = ('bar', 'baz')'''
+    expected = _('''x = ('bar', 'baz')''')
+    assert _fmt(unfmt) == expected
 
-    unfmt = '''x = {"bar", "baz"}'''
-    assert _fmt(unfmt) == '''x = {"bar", "baz"}'''
+    unfmt    = '''x = {"bar", "baz"}'''
+    expected = _('''x = {"bar", "baz"}''')
+    assert _fmt(unfmt) == expected
 
-    unfmt = '''x = {'bar', 'baz'}'''
-    assert _fmt(unfmt) == '''x = {'bar', 'baz'}'''
+    unfmt    = '''x = {'bar', 'baz'}'''
+    expected = _('''x = {'bar', 'baz'}''')
+    assert _fmt(unfmt) == expected
 
-    unfmt = '''d["foo"], d["bar"] = something.split()'''
-    assert _fmt(unfmt) == '''d['foo'], d['bar'] = something.split()'''
-
-
-def test_fmt_off():
-    pass
+    unfmt    = '''d["foo"], d["bar"] = something.split()'''
+    expected = _('''d['foo'], d['bar'] = something.split()''')
+    assert _fmt(unfmt) == expected
 
 
-def test_alignment():
-    pass
+def test_fmt_off_on():
+    unfmt = '''
+    # fmt: off
+    x = {"foo": "bar"}
+    # fmt: on
+    y = {'foo': "bar"}
+    '''
+    assert _fmt(unfmt) == _(unfmt)
+
+    unfmt    = '''
+    # fmt: moep
+    x = {"foo": "bar"}
+    # fmt: on
+    y = {'foo': "bar"}
+    '''
+    expected = '''
+    # fmt: moep
+    x = {'foo': "bar"}
+    # fmt: on
+    y = {'foo': "bar"}
+    '''
+    assert _fmt(unfmt) == _(expected)
+
+
+def test_alignment_1():
+    unfmt    = '''
+    {
+        "hitcount": 0,
+        "bookmark_id": bm_id,
+    }
+    '''
+    expected = '''
+    {
+        'hitcount'   : 0,
+        'bookmark_id': bm_id,
+    }
+    '''
+    assert _fmt(unfmt) == _(expected)
+
+
+def test_alignment_2():
+    unfmt    = '''
+    {
+        "foo": 0,
+        "foobar": 123,
+        "foobarbaz": 123456,
+    }
+    '''
+    expected = '''
+    {
+        'foo'      :      0,
+        'foobar'   :    123,
+        'foobarbaz': 123456,
+    }
+    '''
+    assert _fmt(unfmt) == _(expected)
+
+
+def test_alignment_3():
+    unfmt = '''
+    log("found a total of {} files on s3".format(len(files_on_s3)))
+    log("a total of {} files are stored locally".format(len(local_file_names)))
+    '''
+    assert _fmt(unfmt) == _(unfmt)
+
+
+def test_alignment_4():
+    unfmt    = '''
+    NO_ALIGN_BLOCK_END_MATCHERS = {
+        '"': re.compile(DOUBLE_QUOTE_END_PATTERN, flags=re.VERBOSE),
+        '"""': re.compile(TRIPPLE_DOUBLE_QUOTE_END_PATTERN, flags=re.VERBOSE),
+        "'": re.compile(QUOTE_END_PATTERN, flags=re.VERBOSE),
+    }
+    '''
+    expected = '''
+    NO_ALIGN_BLOCK_END_MATCHERS = {
+        '"'  : re.compile(DOUBLE_QUOTE_END_PATTERN        , flags=re.VERBOSE),
+        '"""': re.compile(TRIPPLE_DOUBLE_QUOTE_END_PATTERN, flags=re.VERBOSE),
+        "'"  : re.compile(QUOTE_END_PATTERN               , flags=re.VERBOSE),
+    }
+    '''
+    assert _fmt(unfmt) == _(expected)
