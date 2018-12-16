@@ -340,6 +340,7 @@ def _is_single_quoted_non_symbol(col_index: int, tok_cell: Token) -> bool:
     return (
         tok_cell.typ == TokenType.BLOCK
         and len(tok_cell.val) > 2
+        and tok_cell.val[:3] != "'''"
         and tok_cell.val[0] == "'"
         and tok_cell.val[-1] == "'"
         and '"' not in tok_cell.val[1:-1]
