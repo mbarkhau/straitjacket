@@ -7,7 +7,7 @@ Project/Repo:
 
 [![MIT License][license_img]][license_ref]
 [![Supported Python Versions][pyversions_img]][pyversions_ref]
-[![PyCalVer v201812.0005-alpha][version_img]][version_ref]
+[![PyCalVer v201812.0006-alpha][version_img]][version_ref]
 [![PyPI Version][pypi_img]][pypi_ref]
 [![PyPI Downloads][downloads_img]][downloads_ref]
 
@@ -59,7 +59,7 @@ Code Quality/CI:
 [downloads_img]: https://pepy.tech/badge/straitjacket
 [downloads_ref]: https://pepy.tech/project/straitjacket
 
-[version_img]: https://img.shields.io/badge/PyCalVer-v201812.0005--alpha-blue.svg
+[version_img]: https://img.shields.io/badge/PyCalVer-v201812.0006--alpha-blue.svg
 [version_ref]: https://pypi.org/project/pycalver/
 
 [pyversions_img]: https://img.shields.io/pypi/pyversions/straitjacket.svg
