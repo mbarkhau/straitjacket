@@ -164,6 +164,9 @@ def test_symbol_normalization():
     unfmt = '''x = {'bar', 'baz'}'''
     assert _fmt(unfmt) == '''x = {'bar', 'baz'}'''
 
+    unfmt = '''d["foo"], d["bar"] = something.split()'''
+    assert _fmt(unfmt) == '''d['foo'], d['bar'] = something.split()'''
+
 
 def test_fmt_off():
     pass
