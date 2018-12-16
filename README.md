@@ -54,6 +54,29 @@ OffsetWidth = int                     # OffsetWidth = int
 TokenTable  = typ.List[TokenRow]      # TokenTable = typ.List[TokenRow]
 ```
 
+## Usage
+
+Usage is exactly the same as for `black`, except that the command is named `sjfmt`.
+
+```shell
+$ pip install straitjacket
+$ sjfmt --help
+Usage: sjfmt [OPTIONS] [SRC]...
+
+  Another uncompromising code formatter.
+
+Options:
+  -l, --line-length INTEGER       How many characters per line to allow.
+                                  [default: 88]
+  --py36                          Allow using Python 3.6-only syntax on all
+```
+
+Plugins for your editor usually support setting a custom path to black. You
+can simply point to sjfmt instead.
+
+```shell
+$ which sjfmt
+```
 
 [repo_ref]: https://gitlab.com/mbarkhau/straitjacket
 

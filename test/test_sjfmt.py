@@ -106,7 +106,7 @@ class TestEnv(myenv.BaseEnv):
 def _(code: str) -> str:
     """Helper to normalize indent level of inline fixtures."""
     code   = code.lstrip("\n")
-    indent = min(len(line) - len(line.lstrip(" ")) for line in code.splitlines())
+    indent = min(len(line) - len(line.lstrip(" ")) for line in code.splitlines() if line.strip())
     lines  = [line[indent:].rstrip(" ") for line in code.splitlines()]
     return "\n".join(lines).rstrip() + "\n"
 
@@ -123,7 +123,7 @@ def _fmt(code: str) -> str:
     #   black.format_str.
 
     line_length   = max(len(line) + 1 for line in code.splitlines())
-    mode          = black.FileMode.NO_STRING_NORMALIZATION
+    mode          = (black.FileMode.NO_STRING_NORMALIZATION | black.FileMode.PYTHON36)
     blackend_code = black.format_str(code, line_length=line_length, mode=mode)
     assert blackend_code == code
 
@@ -236,18 +236,18 @@ def test_alignment_1():
 
 
 def test_alignment_2():
-    unfmt    = '''
+    unfmt = '''
     {
         "foo": 0,
         "foobar": 123,
-        "foobarbaz": 123456,
+        "foobarbaz": 123_456,
     }
     '''
     expected = '''
     {
-        'foo'      :      0,
-        'foobar'   :    123,
-        'foobarbaz': 123456,
+        'foo'      :       0,
+        'foobar'   :     123,
+        'foobarbaz': 123_456,
     }
     '''
     assert _fmt(unfmt) == _(expected)
@@ -295,6 +295,56 @@ def test_alignment_5():
     foobar = """
     baz
     """
+    '''
+    assert _fmt(unfmt) == _(expected)
+
+
+def test_alignment_6():
+    unfmt = '''
+    import typing as typ
+
+    # Cache for already loaded environment configs. Environment
+    # variables are only parsed once during initialization.
+
+    EnvMapKey = typ.Tuple[typ.Type[EnvType], int]
+    EnvMap = typ.Dict[EnvMapKey, EnvType]
+
+    _envmap: EnvMap = {}
+    '''
+    expected = '''
+    import typing as typ
+
+    # Cache for already loaded environment configs. Environment
+    # variables are only parsed once during initialization.
+
+    EnvMapKey = typ.Tuple[typ.Type[EnvType], int]
+    EnvMap    = typ.Dict[EnvMapKey, EnvType]
+
+    _envmap: EnvMap = {}
+    '''
+    assert _fmt(unfmt) == _(expected)
+
+
+def test_alignment_7():
+    unfmt = '''
+    import typing as typ
+
+
+    class _Field(typ.NamedTuple):
+        fname: str
+        ftyp: FieldType
+        env_key: str
+        fallback: FieldValue
+    '''
+    expected = '''
+    import typing as typ
+
+
+    class _Field(typ.NamedTuple):
+        fname   : str
+        ftyp    : FieldType
+        env_key : str
+        fallback: FieldValue
     '''
 
     assert _fmt(unfmt) == _(expected)

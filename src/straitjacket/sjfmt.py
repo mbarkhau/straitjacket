@@ -9,7 +9,11 @@ import re
 import enum
 import typing as typ
 
+import click
 import black
+
+
+__version__ = "v201812.0006-alpha"
 
 
 DEBUG_LVL = 0
@@ -625,6 +629,7 @@ def patch_format_str() -> None:
 
 def main(*args, **kwargs) -> None:
     black.main.help = "Another uncompromising code formatter."
+    black.main = click.version_option(version=__version__)(black.main)
     patch_format_str()
     black.patch_click()
     return black.main(*args, **kwargs)
