@@ -135,6 +135,8 @@ SYMBOL_STRING_RE = re.compile(r"\"[a-zA-Z0-9_\-]+\"")
 
 NON_SYMBOL_STRING_RE = re.compile(r"[^a-zA-Z0-9_\-]")
 
+FMT_ON_OFF_RE = re.compile(r"#\s*fmt\s*:\s*(on|off)")
+
 
 class TokenType(enum.Enum):
 
@@ -429,25 +431,39 @@ def _normalize_strings(row: TokenRow) -> None:
             row[col_index] = Token(TokenType.BLOCK, normalized_token_val)
 
 
-def _find_alignment_contexts(table: TokenTable) -> typ.Iterator[AlignmentContext]:
+def _iter_formattable_rows(table: TokenTable) -> typ.Iterator[TokenRow]:
     is_fmt_enabled = True
-
     for row in table:
+        for tok in row:
+            if tok.typ != TokenType.COMMENT:
+                continue
+
+            fmt_on_off_match = FMT_ON_OFF_RE.match(tok.val)
+            if fmt_on_off_match is None:
+                continue
+
+            if fmt_on_off_match.group(1) == 'on':
+                is_fmt_enabled = True
+            if fmt_on_off_match.group(1) == 'off':
+                is_fmt_enabled = False
+
+        if is_fmt_enabled:
+            yield row
+
+
+def _iter_alignment_contexts(table: TokenTable) -> typ.Iterator[AlignmentContext]:
+    for row in _iter_formattable_rows(table):
+        is_multiline_row = any(
+            token.typ != TokenType.NEWLINE and "\n" in token.val
+            for token in row
+        )
+        if is_multiline_row:
+            continue
+
         ctx   : AlignmentContext = {}
         layout: RowLayoutTokens  = ()
 
-        if is_fmt_enabled:
-            _normalize_strings(row)
-
         for col_index, token in enumerate(row):
-            if token.typ == TokenType.COMMENT and "fmt: off" in token.val:
-                is_fmt_enabled = False
-            if token.typ == TokenType.COMMENT and "fmt: on" in token.val:
-                is_fmt_enabled = True
-
-            if not is_fmt_enabled:
-                continue
-
             layout_token_val: TokenVal = ""
 
             if token.typ in LAYOUT_VAL_TOKENS:
@@ -573,7 +589,10 @@ def _align_formatted_str(src_contents: str) -> FileContent:
                 print(tok_cell, end="\n     ")
             print()
 
-    alignment_contexts = list(_find_alignment_contexts(table))
+    for row in _iter_formattable_rows(table):
+        _normalize_strings(row)
+
+    alignment_contexts = list(_iter_alignment_contexts(table))
     cell_groups        = _find_cell_groups(alignment_contexts)
 
     if DEBUG_LVL >= 2:

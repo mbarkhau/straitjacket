@@ -277,3 +277,24 @@ def test_alignment_4():
     }
     '''
     assert _fmt(unfmt) == _(expected)
+
+
+def test_alignment_5():
+    unfmt    = '''
+    foo = """
+    bar
+    """
+    foobar = """
+    baz
+    """
+    '''
+    expected = '''
+    foo = """
+    bar
+    """
+    foobar = """
+    baz
+    """
+    '''
+
+    assert _fmt(unfmt) == _(expected)
