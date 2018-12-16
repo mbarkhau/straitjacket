@@ -365,7 +365,7 @@ fmt:
 		 src/ test/
 
 
-## Shortcut for make fmt lint pylint test
+## Shortcut for make fmt lint mypy test
 .PHONY: check
 check:  fmt lint mypy test
 

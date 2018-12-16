@@ -306,13 +306,36 @@ CellGroups = typ.Dict[AlignmentCellKey, typ.List[AlignmentCell]]
 
 
 def _is_dict_key_symbol_access(col_index: int, tok_cell: Token, row: TokenRow) -> bool:
-    return (
-        tok_cell.typ == TokenType.SEPARATOR
-        and tok_cell.val in (":", "]", "],", ",")
-        and col_index > 0
-        and row[col_index - 1].typ == TokenType.BLOCK
-        and bool(SYMBOL_STRING_RE.match(row[col_index - 1].val))
-    )
+    """Determine if the current token is a separator for __getitem__, __setitem__."""
+
+    if col_index - 1 < 0:
+        return False
+
+    if tok_cell.val not in ": ] ],":
+        return False
+
+    prev_tok = row[col_index - 1]
+    if prev_tok.typ != TokenType.BLOCK:
+        return False
+
+    if SYMBOL_STRING_RE.match(prev_tok.val) is None:
+        return False
+
+    if tok_cell.typ != TokenType.SEPARATOR:
+        return False
+
+    if tok_cell.val in ("]", "],"):
+        if col_index - 2 < 0:
+            return False
+
+        prevprev_tok = row[col_index - 2]
+        if prevprev_tok == Token(TokenType.SEPARATOR, "["):
+            return True
+
+    if tok_cell.val == ":":
+        return True
+
+    return False
 
 
 ATTR_ACCESORS = ('getattr', 'setattr', 'delattr')

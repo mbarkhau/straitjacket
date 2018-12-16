@@ -103,17 +103,26 @@ class TestEnv(myenv.BaseEnv):
 
 
 def _fmt(code: str) -> str:
-    sjfmt.DEBUG_LVL = 2
+    sjfmt.DEBUG_LVL = 1
     try:
-        return sjfmt._align_formatted_str(code.strip())
+        return sjfmt._align_formatted_str(code.strip(" "))
     finally:
         sjfmt.DEBUG_LVL = 0
 
+
+def test_selftest():
+    with open(__file__) as fh:
+        unfmt = fh.read()
+    assert _fmt(unfmt) == unfmt
+
+
 def test_string_quoting():
-    assert _fmt("""text_ok = "ast }"   """) == """text_ok = "ast }"   """.strip()
-    assert _fmt("""text_nok = 'ast }'  """) == """text_nok = "ast }"  """.strip()
-    assert _fmt("""unchanged = "ast"   """) == """unchanged = "ast"   """.strip()
-    assert _fmt("""unchanged = 'ast'   """) == """unchanged = 'ast'   """.strip()
+    assert _fmt("""text_ok = "foo }"         """) == """text_ok = "foo }"         """.strip()
+    assert _fmt("""text_nok = 'foo }'        """) == """text_nok = "foo }"        """.strip()
+    assert _fmt("""unchanged = "foo"         """) == """unchanged = "foo"         """.strip()
+    assert _fmt("""unchanged = 'foo'         """) == """unchanged = 'foo'         """.strip()
+    assert _fmt("""unchanged = ("foo", 'bar')""") == """unchanged = ("foo", 'bar')""".strip()
+    assert _fmt("""unchanged = ['foo', "bar"]""") == """unchanged = ['foo', "bar"]""".strip()
 
     assert _fmt("""d["symbol_key"]  """) == """d['symbol_key']  """.strip()
     assert _fmt("""d['symbol_key']  """) == """d['symbol_key']  """.strip()
@@ -138,7 +147,22 @@ def test_symbol_normalization():
     assert _fmt(unfmt ) == '''d['foo'], d['bar'] = something.split()'''
 
     unfmt = '''x = ["bar", "baz"]'''
+    assert _fmt(unfmt) == '''x = ["bar", "baz"]'''
+
+    unfmt = '''x = ['bar', 'baz']'''
     assert _fmt(unfmt) == '''x = ['bar', 'baz']'''
+
+    unfmt = '''x = ("bar", "baz")'''
+    assert _fmt(unfmt) == '''x = ("bar", "baz")'''
+
+    unfmt = '''x = ('bar', 'baz')'''
+    assert _fmt(unfmt) == '''x = ('bar', 'baz')'''
+
+    unfmt = '''x = {"bar", "baz"}'''
+    assert _fmt(unfmt) == '''x = {"bar", "baz"}'''
+
+    unfmt = '''x = {'bar', 'baz'}'''
+    assert _fmt(unfmt) == '''x = {'bar', 'baz'}'''
 
 
 def test_fmt_off():
