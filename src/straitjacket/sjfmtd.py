@@ -7,10 +7,12 @@ from straitjacket import sjfmt
 import black
 import blackd
 
-sjfmt.patch_format_str()
-main = blackd.main
+
+def main(*args, **kwargs) -> None:
+    sjfmt.patch_format_str()
+    black.patch_click()
+    return blackd.main(*args, **kwargs)
 
 
 if __name__ == '__main__':
-    black.patch_click()
     main()

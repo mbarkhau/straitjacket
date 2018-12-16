@@ -1,3 +1,4 @@
+import black
 import straitjacket.sjfmt as sjfmt
 
 
@@ -102,10 +103,33 @@ class TestEnv(myenv.BaseEnv):
 #####################
 
 
+def _(code: str) -> str:
+    """Helper to normalize indent level of inline fixtures."""
+    code   = code.lstrip("\n")
+    indent = min(len(line) - len(line.lstrip(" ")) for line in code.splitlines())
+    lines  = [line[indent:].rstrip(" ") for line in code.splitlines()]
+    return "\n".join(lines).rstrip() + "\n"
+
+
 def _fmt(code: str) -> str:
-    sjfmt.DEBUG_LVL = 1
+    code = _(code)
+
+    # NOTE (mb 2018-12-16): We're not testing arbitrary
+    #   formatting here, rather we're testing
+    #   _align_formatted_str specifically, which expects input
+    #   which has already been formatted by black.format_str.
+    #   Accordingly, the first thing we do is to check that the
+    #   test is valid code as would have been produced by
+    #   black.format_str.
+
+    line_length   = max(len(line) + 1 for line in code.splitlines())
+    mode          = black.FileMode.NO_STRING_NORMALIZATION
+    blackend_code = black.format_str(code, line_length=line_length, mode=mode)
+    assert blackend_code == code
+
+    sjfmt.DEBUG_LVL = 0
     try:
-        return sjfmt._align_formatted_str(code.strip(" "))
+        return sjfmt._align_formatted_str(code)
     finally:
         sjfmt.DEBUG_LVL = 0
 

@@ -577,10 +577,12 @@ def patch_format_str() -> None:
     setattr(black, '_black_format_str_unpatched', black_format_str)
 
 
-patch_format_str()
-main = black.main
+def main(*args, **kwargs) -> None:
+    black.main.help = "Another uncompromising code formatter."
+    patch_format_str()
+    black.patch_click()
+    return black.main(*args, **kwargs)
 
 
 if __name__ == '__main__':
-    black.patch_click()
     main()
