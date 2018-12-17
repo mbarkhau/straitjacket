@@ -33,6 +33,14 @@ Code Quality/CI:
 
 [](TOC)
 
+  - [Alignment](#alignment)
+  - [Usage](#usage)
+  - [Editor/Tooling Integration](#editortooling-integration)
+      - [sublack](#sublack)
+      - [vscode python extension](#vscode-python-extension)
+      - [BlackPycharm](#blackpycharm)
+  - [Flake8](#flake8)
+
 [](TOC)
 
 ## Alignment
@@ -71,7 +79,7 @@ Options:
   --py36                          Allow using Python 3.6-only syntax on all
 ```
 
-## Editors
+## Editor/Tooling Integration
 
 Plugins for your editor usually support setting a custom path to black. You
 can simply point to sjfmt instead.
@@ -91,20 +99,80 @@ C:\Python37\Scripts\sjfmt.exe
 
 or
 
-PS C:\Users\ManuelBarkhau> (gcm sjfmt).Path
+PS C:\Users\Username> (gcm sjfmt).Path
 C:\Python37\Scripts\sjfmt.exe
 ```
 
-[sublack]:
+### [sublack](https://github.com/jgirardet/sublack):
 
 ```json
 {
-      "black_command": "C:/Python37/Scripts/sjfmt.exe",
-      "black_line_length": 100,
-      // ...
+
+    "black_command": "C:/Python37/Scripts/sjfmt.exe",
+    "black_line_length": 100,
+    // ...
 }
 ```
 
+Document formatting can be triggered with `Ctrl+Alt+F`.
+
+
+### [vscode python extension](https://marketplace.visualstudio.com/items?itemName=ms-python.python)
+
+
+```json
+{
+    "python.formatting.provider": "black",
+    "python.formatting.blackPath": "C:\\Python37\\Scripts\\sjfmt.exe",
+    "python.formatting.blackArgs": [
+        "--line-length", "100",
+        "--py36",
+        "--skip-string-normalization"
+    ],
+}
+```
+
+Document formatting can be triggered with `Shift+Alt+F`.
+
+
+### [BlackPycharm](https://github.com/pablogsal/black-pycharm)
+
+Install the plugin `black-pycharm`, which can be found in
+`Settings > Plugins > Brows Repositories`. You may have to
+restart PyCharm for the plugin to load.
+
+To configure the path, go to `Settings > Tools > BlackPycharm
+Configuration` and set `Path to Black executable` to the location
+of the sjfmt binary.
+
+You can reformat your code using `Ctrl + Shift + A` to access the
+`Find Action` panel. The name of the action to format your code
+is `Reformat code (BLACK)`. You may want to rebind this action,
+at least in my setup the default binding didn't seem to work.
+
+
+## Flake8
+
+By the nature of this plugin, certain flake8 codes will be
+violated. This is an excerpt from what you might put in your
+`setup.cfg` to ignore these:
+
+```
+[flake8]
+ignore =
+    # No whitespace after paren open "("
+    E201
+    # No whitespace before paren ")"
+    E202
+    # Whitespace before ":"
+    E203
+    # Multiple spaces before operator
+    E221
+    # Multiple spaces after operand
+    E222
+    # Multiple spaces before keyword
+    E272
+```
 
 
 [repo_ref]: https://gitlab.com/mbarkhau/straitjacket
