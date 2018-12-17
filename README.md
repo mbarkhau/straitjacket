@@ -71,12 +71,41 @@ Options:
   --py36                          Allow using Python 3.6-only syntax on all
 ```
 
+## Editors
+
 Plugins for your editor usually support setting a custom path to black. You
 can simply point to sjfmt instead.
 
+Unix
 ```shell
 $ which sjfmt
+/home/user/miniconda3/envs/py36/bin/sjfmt
+$ which sjfmtd
+/home/user/miniconda3/envs/py36/bin/sjfmtd
 ```
+
+Windows
+```shell
+C:\Users\Username>where sjfmt
+C:\Python37\Scripts\sjfmt.exe
+
+or
+
+PS C:\Users\ManuelBarkhau> (gcm sjfmt).Path
+C:\Python37\Scripts\sjfmt.exe
+```
+
+[sublack]:
+
+```json
+{
+      "black_command": "C:/Python37/Scripts/sjfmt.exe",
+      "black_line_length": 100,
+      // ...
+}
+```
+
+
 
 [repo_ref]: https://gitlab.com/mbarkhau/straitjacket
 

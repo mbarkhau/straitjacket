@@ -481,6 +481,7 @@ bump_version:
 build_dists:
 	$(DEV_ENV_PY) setup.py sdist;
 	$(DEV_ENV_PY) setup.py bdist_wheel --python-tag=$(BDIST_WHEEL_PYTHON_TAG);
+	@rm -rf src/*.egg-info
 
 
 ## Upload sdist and bdist files to pypi
