@@ -297,6 +297,7 @@ class AlignmentContextKey(typ.NamedTuple):
     """Does not change between multiple lines that can be aligned."""
 
     col_idx: ColIndex
+    row_idx: RowIndex
     tok_typ: TokenType
     tok_val: TokenVal
     layout : RowLayoutTokens
@@ -435,9 +436,9 @@ def _normalize_strings(row: TokenRow) -> None:
             row[col_index] = Token(TokenType.BLOCK, normalized_token_val)
 
 
-def _iter_formattable_rows(table: TokenTable) -> typ.Iterator[TokenRow]:
+def _iter_formattable_rows(table: TokenTable) -> typ.Iterator[typ.Tuple[int, TokenRow]]:
     is_fmt_enabled = True
-    for row in table:
+    for row_index, row in enumerate(table):
         for tok in row:
             if tok.typ != TokenType.COMMENT:
                 continue
@@ -452,14 +453,13 @@ def _iter_formattable_rows(table: TokenTable) -> typ.Iterator[TokenRow]:
                 is_fmt_enabled = False
 
         if is_fmt_enabled:
-            yield row
+            yield row_index, row
 
 
 def _iter_alignment_contexts(table: TokenTable) -> typ.Iterator[AlignmentContext]:
-    for row in _iter_formattable_rows(table):
+    for row_index, row in _iter_formattable_rows(table):
         is_multiline_row = any(
-            token.typ != TokenType.NEWLINE and "\n" in token.val
-            for token in row
+            token.typ != TokenType.NEWLINE and "\n" in token.val for token in row
         )
         if is_multiline_row:
             continue
@@ -490,7 +490,9 @@ def _iter_alignment_contexts(table: TokenTable) -> typ.Iterator[AlignmentContext
                 prev_token = row[col_index - 1]
                 if prev_token.typ != TokenType.SEPARATOR:
                     offset_width = len(prev_token.val)
-                    ctx_key      = AlignmentContextKey(col_index, token.typ, token.val, layout)
+                    ctx_key      = AlignmentContextKey(
+                        col_index, row_index, token.typ, token.val, layout
+                    )
                     ctx[ctx_key] = offset_width
 
         yield ctx
@@ -498,10 +500,10 @@ def _iter_alignment_contexts(table: TokenTable) -> typ.Iterator[AlignmentContext
 
 def _find_cell_groups(alignment_contexts: typ.List[AlignmentContext]) -> CellGroups:
     cell_groups: typ.Dict[AlignmentCellKey, typ.List[AlignmentCell]] = {}
-    for row_index, ctx in enumerate(alignment_contexts):
+    for ctx in alignment_contexts:
         ctx_items = sorted(ctx.items())
         for ctx_key, offset_width in ctx_items:
-            col_index, token_typ, token_val, layout = ctx_key
+            col_index, row_index, token_typ, token_val, layout = ctx_key
             prev_row_idx = row_index - 1
 
             prev_cell_key = AlignmentCellKey(col_index, prev_row_idx, token_val, layout)
@@ -534,8 +536,10 @@ def _realigned_contents(table: TokenTable, cell_groups: CellGroups) -> str:
         col_idx = ctx_key.col_index - 1
 
         max_offset_width = max(cell.offset_width for cell in cells)
-        cell_row_tokens  = [
-            (cell, table[cell.row_idx], table[cell.row_idx][col_idx]) for cell in cells
+
+        cells_and_rows  = [(cell, table[cell.row_idx]) for cell in cells]
+        cell_row_tokens = [
+            (cell, row, row[col_idx]) for cell, row in cells_and_rows if col_idx < len(row)
         ]
 
         is_numeric_cell_group = True
@@ -593,7 +597,7 @@ def _align_formatted_str(src_contents: str) -> FileContent:
                 print(tok_cell, end="\n     ")
             print()
 
-    for row in _iter_formattable_rows(table):
+    for _, row in _iter_formattable_rows(table):
         _normalize_strings(row)
 
     alignment_contexts = list(_iter_alignment_contexts(table))
@@ -619,6 +623,7 @@ def patch_format_str() -> None:
         src_contents: str, line_length: int, *, mode: black.FileMode = black.FileMode.AUTO_DETECT
     ) -> black.FileContent:
         mode |= black.FileMode.NO_STRING_NORMALIZATION
+        mode |= black.FileMode.PYTHON36
         black_dst_contents = black_format_str(src_contents, line_length=line_length, mode=mode)
         sjfmt_dst_contents = _align_formatted_str(black_dst_contents)
         return sjfmt_dst_contents
@@ -629,7 +634,7 @@ def patch_format_str() -> None:
 
 def main(*args, **kwargs) -> None:
     black.main.help = "Another uncompromising code formatter."
-    black.main = click.version_option(version=__version__)(black.main)
+    black.main      = click.version_option(version=__version__)(black.main)
     patch_format_str()
     black.patch_click()
     return black.main(*args, **kwargs)

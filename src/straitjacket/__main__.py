@@ -17,11 +17,9 @@ except ImportError:
 
 import sys
 
-import black
 from . import sjfmt
 
 
 if __name__ == '__main__':
-    black.patch_click()
     sjfmt.main()
     sys.exit(0)

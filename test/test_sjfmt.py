@@ -123,15 +123,18 @@ def _fmt(code: str) -> str:
     #   black.format_str.
 
     line_length   = max(len(line) + 1 for line in code.splitlines())
-    mode          = (black.FileMode.NO_STRING_NORMALIZATION | black.FileMode.PYTHON36)
+    mode          = black.FileMode.NO_STRING_NORMALIZATION | black.FileMode.PYTHON36
     blackend_code = black.format_str(code, line_length=line_length, mode=mode)
     assert blackend_code == code
 
     sjfmt.DEBUG_LVL = 0
     try:
-        return sjfmt._align_formatted_str(code)
+        sjfmt_out_code = sjfmt._align_formatted_str(code)
     finally:
         sjfmt.DEBUG_LVL = 0
+
+    black.assert_equivalent(code, sjfmt_out_code)
+    return sjfmt_out_code
 
 
 def test_string_quoting():
@@ -204,7 +207,7 @@ def test_fmt_off_on():
     '''
     assert _fmt(unfmt) == _(unfmt)
 
-    unfmt    = '''
+    unfmt = '''
     # fmt: moep
     x = {"foo": "bar"}
     # fmt: on
@@ -220,7 +223,7 @@ def test_fmt_off_on():
 
 
 def test_alignment_1():
-    unfmt    = '''
+    unfmt = '''
     {
         "hitcount": 0,
         "bookmark_id": bm_id,
@@ -262,7 +265,7 @@ def test_alignment_3():
 
 
 def test_alignment_4():
-    unfmt    = '''
+    unfmt = '''
     NO_ALIGN_BLOCK_END_MATCHERS = {
         '"': re.compile(DOUBLE_QUOTE_END_PATTERN, flags=re.VERBOSE),
         '"""': re.compile(TRIPPLE_DOUBLE_QUOTE_END_PATTERN, flags=re.VERBOSE),
@@ -280,7 +283,7 @@ def test_alignment_4():
 
 
 def test_alignment_5():
-    unfmt    = '''
+    unfmt = '''
     foo = """
     bar
     """
@@ -345,6 +348,44 @@ def test_alignment_7():
         ftyp    : FieldType
         env_key : str
         fallback: FieldValue
+    '''
+
+    assert _fmt(unfmt) == _(expected)
+
+
+def test_debug():
+    unfmt = '''
+    # fmt: off
+
+
+    # fmt: on
+
+
+    def fn():
+        if d:
+            x
+        x = x
+
+
+    b = int
+    oo = str
+    '''
+
+    expected = '''
+    # fmt: off
+
+
+    # fmt: on
+
+
+    def fn():
+        if d:
+            x
+        x = x
+
+
+    b  = int
+    oo = str
     '''
 
     assert _fmt(unfmt) == _(expected)
