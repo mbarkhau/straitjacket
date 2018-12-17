@@ -13,7 +13,7 @@ import click
 import black
 
 
-__version__ = "v201812.0006-alpha"
+__version__ = "v201812.0007-alpha"
 
 
 DEBUG_LVL = 0
