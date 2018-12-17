@@ -498,7 +498,7 @@ upload_dists:
 	$(DEV_ENV)/bin/twine upload $$($(SDIST_FILE_CMD)) $$($(BDIST_WHEEL_FILE_CMD));
 
 
-## Publish on pypi
+## bump_version build_dists upload_dists
 .PHONY: publish
 publish: bump_version build_dists upload_dists
 
