@@ -1,5 +1,10 @@
 # Changelog for straitjacket
 
+## v201904.0008-beta
+
+ - Update for release of black==19.3b0
+
+
 ## v201812.0007-alpha
 
  TLDR: more bugfixes and updated documentation
