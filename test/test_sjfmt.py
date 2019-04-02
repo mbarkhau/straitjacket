@@ -123,8 +123,9 @@ def _fmt(code: str) -> str:
     #   black.format_str.
 
     line_length   = max(len(line) + 1 for line in code.splitlines())
-    mode          = black.FileMode.NO_STRING_NORMALIZATION | black.FileMode.PYTHON36
-    blackend_code = black.format_str(code, line_length=line_length, mode=mode)
+    mode          = black.FileMode(line_length=line_length)
+    mode          = sjfmt._mode_override_defaults(mode)
+    blackend_code = black.format_str(code, mode=mode)
     assert blackend_code == code
 
     sjfmt.DEBUG_LVL = 0

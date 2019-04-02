@@ -12,7 +12,6 @@ import typing as typ
 import click
 import black
 
-
 __version__ = "v201812.0007-alpha"
 
 
@@ -613,18 +612,24 @@ def _align_formatted_str(src_contents: str) -> FileContent:
     return _realigned_contents(table, cell_groups)
 
 
+def _mode_override_defaults(mode: black.FileMode):
+    return black.FileMode(
+        target_versions=black.PY36_VERSIONS,
+        line_length=mode.line_length,
+        string_normalization=False,
+        is_pyi=mode.is_pyi,
+    )
+
+
 def patch_format_str() -> None:
     if hasattr(black, '_black_format_str_unpatched'):
         return
 
     black_format_str = black.format_str
 
-    def format_str_wrapper(
-        src_contents: str, line_length: int, *, mode: black.FileMode = black.FileMode.AUTO_DETECT
-    ) -> black.FileContent:
-        mode |= black.FileMode.NO_STRING_NORMALIZATION
-        mode |= black.FileMode.PYTHON36
-        black_dst_contents = black_format_str(src_contents, line_length=line_length, mode=mode)
+    def format_str_wrapper(src_contents: str, *, mode: black.FileMode) -> black.FileContent:
+        mode               = _mode_override_defaults(mode)
+        black_dst_contents = black_format_str(src_contents, mode=mode)
         sjfmt_dst_contents = _align_formatted_str(black_dst_contents)
         return sjfmt_dst_contents
 
