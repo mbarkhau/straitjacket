@@ -634,7 +634,7 @@ def patch_format_str() -> None:
         return sjfmt_dst_contents
 
     black.format_str = format_str_wrapper
-    setattr(black, '_black_format_str_unpatched', black_format_str)
+    black._black_format_str_unpatched = black_format_str
 
 
 def main(*args, **kwargs) -> None:
