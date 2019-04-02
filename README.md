@@ -187,7 +187,7 @@ ignore =
 [license_ref]: https://gitlab.com/mbarkhau/straitjacket/blob/master/LICENSE
 
 [mypy_img]: https://img.shields.io/badge/mypy-checked-green.svg
-[mypy_ref]: http://mypy-lang.org/
+[mypy_ref]: https://mbarkhau.gitlab.io/straitjacket/mypycov
 
 [style_img]: https://img.shields.io/badge/code%20style-%20sjfmt-f71.svg
 [style_ref]: https://gitlab.com/mbarkhau/straitjacket/
@@ -195,10 +195,10 @@ ignore =
 [pypi_img]: https://img.shields.io/badge/PyPI-wheels-green.svg
 [pypi_ref]: https://pypi.org/project/straitjacket/#files
 
-[downloads_img]: https://pepy.tech/badge/straitjacket
+[downloads_img]: https://pepy.tech/badge/straitjacket/month
 [downloads_ref]: https://pepy.tech/project/straitjacket
 
-[version_img]: https://img.shields.io/badge/PyCalVer-v201812.0007--alpha-blue.svg
+[version_img]: https://img.shields.io/static/v1.svg?label=PyCalVer&message=v201812.0007-alpha&color=blue
 [version_ref]: https://pypi.org/project/pycalver/
 
 [pyversions_img]: https://img.shields.io/pypi/pyversions/straitjacket.svg

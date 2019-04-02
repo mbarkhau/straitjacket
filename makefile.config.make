@@ -1,5 +1,5 @@
 
-PACKAGE_NAME = straitjacket
+PACKAGE_NAME := straitjacket
 
 # This is the python version that is used for:
 # - `make fmt`
@@ -8,8 +8,9 @@ PACKAGE_NAME = straitjacket
 # - `make devtest`
 DEVELOPMENT_PYTHON_VERSION := python=3.6
 
-# These must be valid conda package names. A separate
-# conda environment will be created for each of these.
+# These must be valid (space separated) conda package names.
+# A separate conda environment will be created for each of these.
+#
 # Some valid options are:
 # - python=2.7
 # - python=3.5
