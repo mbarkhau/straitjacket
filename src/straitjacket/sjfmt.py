@@ -12,7 +12,7 @@ import typing as typ
 import click
 import black
 
-__version__ = "v201904.0009-alpha"
+__version__ = "v201904.0010-beta"
 
 
 DEBUG_LVL = 0
