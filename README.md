@@ -170,8 +170,12 @@ ignore =
     E221
     # Multiple spaces after operand
     E222
+    # Multiple spaces after ':'
+    E241
     # Multiple spaces before keyword
     E272
+    # Spaces around keyword/parameter equals
+    E251
 ```
 
 
