@@ -435,7 +435,6 @@ ipy:
 ## Like `make test`, but with debug parameters
 .PHONY: devtest
 devtest:
-	@rm -rf ".pytest_cache";
 	@rm -rf "src/__pycache__";
 	@rm -rf "test/__pycache__";
 
@@ -447,6 +446,7 @@ ifdef FILTER
 		--verbose \
 		--capture=no \
 		--exitfirst \
+		--failed-first \
 		-k $(FILTER) \
 		test/ src/;
 else
@@ -457,10 +457,10 @@ else
 		--verbose \
 		--capture=no \
 		--exitfirst \
+		--failed-first \
 		test/ src/;
 endif
 
-	@rm -rf ".pytest_cache";
 	@rm -rf "src/__pycache__";
 	@rm -rf "test/__pycache__";
 
