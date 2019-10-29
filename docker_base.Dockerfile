@@ -29,6 +29,8 @@ RUN if ! test -z "${ENV_SSH_PRIVATE_RSA_KEY}"; then \
     ssh-keygen -y -f /root/.ssh/id_rsa > /root/.ssh/id_rsa.pub; \
     fi
 
+RUN apt-get install -y gcc
+
 ADD requirements/ requirements/
 ADD scripts/ scripts/
 

@@ -358,7 +358,7 @@ test:
 	IFS=' ' read -r -a env_py_paths <<< "$(CONDA_ENV_BIN_PYTHON_PATHS)"; \
 	for i in $${!env_py_paths[@]}; do \
 		env_py=$${env_py_paths[i]}; \
-		$${env_py} -m pip install --upgrade .; \
+		$${env_py} setup.py install; \
 		ENV=$${ENV-dev} $${env_py} -m pytest test/; \
 	done;
 
