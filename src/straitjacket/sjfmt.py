@@ -633,7 +633,7 @@ def patch_format_str() -> None:
         sjfmt_dst_contents = _align_formatted_str(black_dst_contents)
         return sjfmt_dst_contents
 
-    black.format_str = format_str_wrapper
+    black.format_str                  = format_str_wrapper
     black._black_format_str_unpatched = black_format_str
 
 
