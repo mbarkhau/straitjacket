@@ -4,6 +4,7 @@
 # (C) 2018 Manuel Barkhau (@mbarkhau)
 # SPDX-License-Identifier: MIT
 
+import os
 import re
 import enum
 import typing as typ
@@ -200,13 +201,13 @@ def _tokenize_for_alignment(src_contents: str) -> typ.Iterator[Token]:
             # Get everything (if anything) up to (and excluding) the newline
             token_val = rest[:curr_token_start]
             if token_val:
-                assert token_val != "\n"
+                assert token_val != os.linesep
                 yield Token(TokenType.CODE, token_val)
 
             # The newline itself (note that black promises to
             # have normalized CRLF etc. to plain LF)
             token_val = rest[curr_token_start:curr_token_end]
-            assert token_val == "\n"
+            assert token_val == os.linesep
             yield Token(TokenType.NEWLINE, token_val)
 
             rest = rest[curr_token_end:]
@@ -220,7 +221,7 @@ def _tokenize_for_alignment(src_contents: str) -> typ.Iterator[Token]:
         elif curr_token_start > 0:
             prev_token_val = rest[:curr_token_start]
             rest           = rest[curr_token_start:]
-            assert prev_token_val != "\n"
+            assert prev_token_val != os.linesep
             assert prev_token_val not in ALIGN_BEFORE_TOKENS, repr(prev_token_val)
             if len(prev_token_val.strip()) == 0:
                 yield Token(TokenType.WHITESPACE, prev_token_val)
@@ -457,7 +458,7 @@ def _iter_formattable_rows(table: TokenTable) -> typ.Iterator[typ.Tuple[int, Tok
 def _iter_alignment_contexts(table: TokenTable) -> typ.Iterator[AlignmentContext]:
     for row_index, row in _iter_formattable_rows(table):
         is_multiline_row = any(
-            token.typ != TokenType.NEWLINE and "\n" in token.val for token in row
+            token.typ != TokenType.NEWLINE and os.linesep in token.val for token in row
         )
         if is_multiline_row:
             continue
@@ -586,7 +587,7 @@ def _align_formatted_str(src_contents: str) -> FileContent:
             table.append([])
         else:
             is_block_token = token.typ in (TokenType.BLOCK, TokenType.COMMENT, TokenType.WHITESPACE)
-            assert is_block_token or "\n" not in token.val
+            assert is_block_token or os.linesep not in token.val
 
     if DEBUG_LVL >= 1:
         for row in table:
