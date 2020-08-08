@@ -16,7 +16,7 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: echo $PWD
-      run: make conda
+      run: echo $PWD
 
     - name: Cache Virtualenvs
       uses: actions/cache@v1
