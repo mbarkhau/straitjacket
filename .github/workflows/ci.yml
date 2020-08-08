@@ -8,28 +8,28 @@ on:
 
 jobs:
 
-  build-ubuntu:
+  # build-ubuntu:
 
-    # runs-on: ubuntu-latest
+  #   runs-on: ubuntu-latest
 
-    # steps:
-    # - uses: actions/checkout@v2
+  #   steps:
+  #   - uses: actions/checkout@v2
 
-    # - name: Cache Virtualenvs
-    #   uses: actions/cache@v1
-    #   with:
-    #     path: ~/miniconda3
-    #     key: ${{ runner.OS }}-env-cache-${{ hashFiles('requirements/*.txt', 'setup.py', 'makefile*') }}
+  #   - name: Cache Virtualenvs
+  #     uses: actions/cache@v1
+  #     with:
+  #       path: ~/miniconda3
+  #       key: ${{ runner.OS }}-env-cache-${{ hashFiles('requirements/*.txt', 'setup.py', 'makefile*') }}
 
-    # - name: make conda
-    #   run: make conda
+  #   - name: make conda
+  #     run: make conda
 
-    # - name: make lint
-    #   run: make lint
-    # - name: make mypy
-    #   run: make mypy
-    # - name: make test
-    #   run: make test
+  #   - name: make lint
+  #     run: make lint
+  #   - name: make mypy
+  #     run: make mypy
+  #   - name: make test
+  #     run: make test
 
   build-macos:
 
