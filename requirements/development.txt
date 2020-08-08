@@ -14,12 +14,6 @@ pudb
 # https://pypi.org/project/q/
 q
 
-# backtrace manipulates Python tracebacks to make them more
-# readable. It provides different configuration options for
-# coloring and formatting.
-# https://github.com/nir0s/backtrace
-backtrace
-
 # Py-Spy: A sampling profiler for Python programs.
 # https://github.com/benfred/py-spy
 # This is good for coarse grained profiling (even on production)
