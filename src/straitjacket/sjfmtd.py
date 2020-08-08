@@ -14,7 +14,7 @@ def main(*args, **kwargs) -> None:
     sjfmt.patch_format_str()
     black.patch_click()
     blackd.main = click.version_option(version=sjfmt.__version__)(black.main)
-    return blackd.main(*args, **kwargs)
+    blackd.main(*args, **kwargs)
 
 
 if __name__ == '__main__':

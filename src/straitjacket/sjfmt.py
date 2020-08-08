@@ -172,9 +172,9 @@ TokenRow = typ.List[Token]
 
 
 def _tokenize_for_alignment(src_contents: str) -> typ.Iterator[Token]:
-    rest           = src_contents
-    prev_rest      = None
-    prev_token_val = None
+    rest          : str = src_contents
+    prev_rest     : typ.Optional[str] = None
+    prev_token_val: typ.Optional[str] = None
 
     while rest:
         assert rest != prev_rest, "No progress at: " + repr(rest[:40])
@@ -641,7 +641,7 @@ def main(*args, **kwargs) -> None:
     black.main      = click.version_option(version=__version__)(black.main)
     patch_format_str()
     black.patch_click()
-    return black.main(*args, **kwargs)
+    black.main(*args, **kwargs)
 
 
 if __name__ == '__main__':
