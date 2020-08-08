@@ -21,6 +21,10 @@ flake8-junit-report
 pylint
 pylint-ignore
 mypy
+
+# https://github.com/microsoft/vscode-python/issues/12949
+setuptools<49.2
+
 # pylint doesn't support isort>=5 for now
 #   https://github.com/PyCQA/pylint/issues/3722
 isort<5
