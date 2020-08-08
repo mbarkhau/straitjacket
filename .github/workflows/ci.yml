@@ -21,7 +21,7 @@ jobs:
         path: |
           ~/miniconda3
           build/*.txt
-        key: ${{ runner.OS }}-conda-env-cache-${{ hashFiles('requirements/*.txt', 'setup.py', 'makefile*') }}
+        key: ${{ runner.OS }}-sjfmt-env-cache-${{ hashFiles('requirements/*.txt', 'setup.py', 'makefile*') }}
 
     - name: make conda
       run: make conda
@@ -46,18 +46,13 @@ jobs:
         path: |
           ~/miniconda3
           build/*.txt
-        key: ${{ runner.OS }}-conda-env-cache-${{ hashFiles('requirements/*.txt', 'setup.py', 'makefile*') }}
+        key: ${{ runner.OS }}-sjfmt-env-cache-${{ hashFiles('requirements/*.txt', 'setup.py', 'makefile*') }}
 
     - name: make conda
       run: make conda
 
-    - name: debug make fmt
-      run: make fmt
-    - name: debug diff
-      run: git diff
-
     - name: make lint
-      run: make lint || true
+      run: make lint
     - name: make mypy
       run: make mypy
     - name: make test
