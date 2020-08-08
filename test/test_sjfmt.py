@@ -1,8 +1,18 @@
+# -*- coding: utf-8 -*-
+# pylint:disable=protected-access
+
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
+from __future__ import unicode_literals
+
+import os
+
 import black
 
 import straitjacket.sjfmt as sjfmt
 
-str_contents = """
+STR_CONTENTS = """
 #!/usr/bin/env python3
 # fmt: on
 # Some license here.
@@ -94,8 +104,8 @@ class TestEnv(myenv.BaseEnv):
     \"\"\"Docstring for instance attribute spam.\"\"\"
 """
 
-# str_contents = open("blacker.py").read()
-# str_contents = open("test.txt").read()
+# STR_CONTENTS = open("blacker.py").read()
+# STR_CONTENTS = open("test.txt").read()
 
 
 #####################
@@ -105,10 +115,10 @@ class TestEnv(myenv.BaseEnv):
 
 def _(code: str) -> str:
     """Helper to normalize indent level of inline fixtures."""
-    code   = code.lstrip("\n")
+    code   = code.lstrip(os.linesep)
     indent = min(len(line) - len(line.lstrip(" ")) for line in code.splitlines() if line.strip())
     lines  = [line[indent:].rstrip(" ") for line in code.splitlines()]
-    return "\n".join(lines).rstrip() + "\n"
+    return os.linesep.join(lines).rstrip() + os.linesep
 
 
 def _fmt(code: str) -> str:
@@ -158,7 +168,7 @@ def test_string_quoting():
 
 
 def test_backslash():
-    _fmt(r'''x = "\\"   ''') == r'''x = "\\"  '''.strip()
+    assert _fmt(r'''x = "\\"  ''') == _(r'''x = "\\"  ''')
 
 
 def test_symbol_normalization():

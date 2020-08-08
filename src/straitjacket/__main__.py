@@ -5,7 +5,6 @@
 # Copyright (c) 2019 Manuel Barkhau (mbarkhau@gmail.com) - MIT License
 # SPDX-License-Identifier: MIT
 
-import os
 import sys
 
 from . import sjfmt

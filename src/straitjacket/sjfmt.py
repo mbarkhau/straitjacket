@@ -39,8 +39,8 @@ ALIGN_BEFORE_TOKENS = {
 # fmt: on
 
 
-# TODO (mb 2018-09-12): Alternatively, implement this using
-# lookback by counting backslashes.
+# NOTE (mb 2018-09-12): An alternative implementation
+#   might use lookback and count backslashes.
 
 TRIPPLE_QUOTE_END_PATTERN = r"""
 (
@@ -325,21 +325,17 @@ def _is_dict_key_symbol_access(col_index: int, tok_cell: Token, row: TokenRow) -
 
     if col_index - 1 < 0:
         return False
-
-    if tok_cell.val not in ": ] ],":
+    elif tok_cell.val not in ": ] ],":
         return False
 
     prev_tok = row[col_index - 1]
     if prev_tok.typ != TokenType.BLOCK:
         return False
-
-    if SYMBOL_STRING_RE.match(prev_tok.val) is None:
+    elif SYMBOL_STRING_RE.match(prev_tok.val) is None:
         return False
-
-    if tok_cell.typ != TokenType.SEPARATOR:
+    elif tok_cell.typ != TokenType.SEPARATOR:
         return False
-
-    if tok_cell.val in ("]", "],"):
+    elif tok_cell.val in ("]", "],"):
         if col_index - 2 < 0:
             return False
 
@@ -347,7 +343,7 @@ def _is_dict_key_symbol_access(col_index: int, tok_cell: Token, row: TokenRow) -
         if prevprev_tok == Token(TokenType.SEPARATOR, "["):
             return True
 
-    if tok_cell.val == ":":
+    elif tok_cell.val == ":":
         return True
 
     return False
@@ -374,7 +370,7 @@ def _is_attr_symbol_access(col_index: int, tok_cell: Token, row: TokenRow) -> bo
     )
 
 
-def _is_single_quoted_non_symbol(col_index: int, tok_cell: Token) -> bool:
+def _is_single_quoted_non_symbol(tok_cell: Token) -> bool:
     return (
         tok_cell.typ == TokenType.BLOCK
         and len(tok_cell.val) > 2
@@ -430,7 +426,7 @@ def _normalize_strings(row: TokenRow) -> None:
 
     # double quotes.
     for col_index, tok_cell in enumerate(row):
-        if _is_single_quoted_non_symbol(col_index, tok_cell):
+        if _is_single_quoted_non_symbol(tok_cell):
             normalized_token_val = '"' + tok_cell.val[1:-1] + '"'
             row[col_index] = Token(TokenType.BLOCK, normalized_token_val)
 
@@ -502,7 +498,7 @@ def _find_cell_groups(alignment_contexts: typ.List[AlignmentContext]) -> CellGro
     for ctx in alignment_contexts:
         ctx_items = sorted(ctx.items())
         for ctx_key, offset_width in ctx_items:
-            col_index, row_index, token_typ, token_val, layout = ctx_key
+            col_index, row_index, _, token_val, layout = ctx_key
             prev_row_idx = row_index - 1
 
             prev_cell_key = AlignmentCellKey(col_index, prev_row_idx, token_val, layout)
@@ -622,7 +618,7 @@ def _mode_override_defaults(mode: black.FileMode):
 
 
 def patch_format_str() -> None:
-    if hasattr(black, '_black_format_str_unpatched'):
+    if hasattr(black, '_black_format_str_unpatched_by_sjfmt'):
         return
 
     black_format_str = black.format_str
@@ -633,8 +629,10 @@ def patch_format_str() -> None:
         sjfmt_dst_contents = _align_formatted_str(black_dst_contents)
         return sjfmt_dst_contents
 
-    black.format_str                  = format_str_wrapper
-    black._black_format_str_unpatched = black_format_str
+    black.format_str = format_str_wrapper
+
+    # pylint:disable=protected-access   ; this is actually our member
+    black._black_format_str_unpatched_by_sjfmt = black_format_str
 
 
 def main(*args, **kwargs) -> None:
