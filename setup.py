@@ -39,7 +39,7 @@ setuptools.setup(
     description="Another Uncompromising Code Formatter for Python.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    packages=["straitjacket"],
+    packages=["straitjacket", "sjfmt_vendor"],
     package_dir={"": "src"},
     install_requires=install_requires,
     extras_require={"d": ["black[d]==19.10b0"]},

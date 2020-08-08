@@ -8,9 +8,8 @@ from __future__ import unicode_literals
 
 import os
 
-import black
-
 import straitjacket.sjfmt as sjfmt
+from sjfmt_vendor import black
 
 STR_CONTENTS = """
 #!/usr/bin/env python3
@@ -126,7 +125,7 @@ def _fmt(code: str) -> str:
 
     # NOTE (mb 2018-12-16): We're not testing arbitrary
     #   formatting here, rather we're testing
-    #   _align_formatted_str specifically, which expects input
+    #   align_formatted_str specifically, which expects input
     #   which has already been formatted by black.format_str.
     #   Accordingly, the first thing we do is to check that the
     #   test is valid code as would have been produced by
@@ -134,13 +133,13 @@ def _fmt(code: str) -> str:
 
     line_length   = max(len(line) + 1 for line in code.splitlines())
     mode          = black.FileMode(line_length=line_length)
-    mode          = sjfmt._mode_override_defaults(mode)
-    blackend_code = black.format_str(code, mode=mode)
+    mode          = black._mode_override_defaults(mode)
+    blackend_code = black.original_format_str(code, mode=mode)
     assert blackend_code == code
 
     sjfmt.DEBUG_LVL = 0
     try:
-        sjfmt_out_code = sjfmt._align_formatted_str(code)
+        sjfmt_out_code = sjfmt.align_formatted_str(code)
     finally:
         sjfmt.DEBUG_LVL = 0
 

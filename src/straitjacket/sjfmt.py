@@ -4,13 +4,14 @@
 # (C) 2018 Manuel Barkhau (@mbarkhau)
 # SPDX-License-Identifier: MIT
 
-import os
 import re
 import enum
 import typing as typ
+import multiprocessing as mp
 
-import black
 import click
+
+from sjfmt_vendor import black
 
 __version__ = "v202008.0012-beta"
 
@@ -201,13 +202,13 @@ def _tokenize_for_alignment(src_contents: str) -> typ.Iterator[Token]:
             # Get everything (if anything) up to (and excluding) the newline
             token_val = rest[:curr_token_start]
             if token_val:
-                assert token_val != os.linesep
+                assert token_val != "\n"
                 yield Token(TokenType.CODE, token_val)
 
             # The newline itself (note that black promises to
             # have normalized CRLF etc. to plain LF)
             token_val = rest[curr_token_start:curr_token_end]
-            assert token_val == os.linesep
+            assert token_val == "\n"
             yield Token(TokenType.NEWLINE, token_val)
 
             rest = rest[curr_token_end:]
@@ -221,7 +222,7 @@ def _tokenize_for_alignment(src_contents: str) -> typ.Iterator[Token]:
         elif curr_token_start > 0:
             prev_token_val = rest[:curr_token_start]
             rest           = rest[curr_token_start:]
-            assert prev_token_val != os.linesep
+            assert prev_token_val != "\n"
             assert prev_token_val not in ALIGN_BEFORE_TOKENS, repr(prev_token_val)
             if len(prev_token_val.strip()) == 0:
                 yield Token(TokenType.WHITESPACE, prev_token_val)
@@ -454,7 +455,7 @@ def _iter_formattable_rows(table: TokenTable) -> typ.Iterator[typ.Tuple[int, Tok
 def _iter_alignment_contexts(table: TokenTable) -> typ.Iterator[AlignmentContext]:
     for row_index, row in _iter_formattable_rows(table):
         is_multiline_row = any(
-            token.typ != TokenType.NEWLINE and os.linesep in token.val for token in row
+            token.typ != TokenType.NEWLINE and "\n" in token.val for token in row
         )
         if is_multiline_row:
             continue
@@ -572,7 +573,7 @@ def _realigned_contents(table: TokenTable, cell_groups: CellGroups) -> str:
     return "".join("".join(token.val for token in row) for row in table)
 
 
-def _align_formatted_str(src_contents: str) -> FileContent:
+def align_formatted_str(src_contents: str) -> FileContent:
     table: TokenTable = [[]]
     for token in _tokenize_for_alignment(src_contents):
         if DEBUG_LVL >= 2:
@@ -583,7 +584,7 @@ def _align_formatted_str(src_contents: str) -> FileContent:
             table.append([])
         else:
             is_block_token = token.typ in (TokenType.BLOCK, TokenType.COMMENT, TokenType.WHITESPACE)
-            assert is_block_token or os.linesep not in token.val
+            assert is_block_token or "\n" not in token.val
 
     if DEBUG_LVL >= 1:
         for row in table:
@@ -608,38 +609,11 @@ def _align_formatted_str(src_contents: str) -> FileContent:
     return _realigned_contents(table, cell_groups)
 
 
-def _mode_override_defaults(mode: black.FileMode):
-    return black.FileMode(
-        target_versions=black.PY36_VERSIONS,
-        line_length=mode.line_length,
-        string_normalization=False,
-        is_pyi=mode.is_pyi,
-    )
-
-
-def patch_format_str() -> None:
-    if hasattr(black, '_black_format_str_unpatched_by_sjfmt'):
-        return
-
-    black_format_str = black.format_str
-
-    def format_str_wrapper(src_contents: str, *, mode: black.FileMode) -> black.FileContent:
-        mode               = _mode_override_defaults(mode)
-        black_dst_contents = black_format_str(src_contents, mode=mode)
-        sjfmt_dst_contents = _align_formatted_str(black_dst_contents)
-        return sjfmt_dst_contents
-
-    black.format_str = format_str_wrapper
-
-    # pylint:disable=protected-access   ; this is actually our member
-    black._black_format_str_unpatched_by_sjfmt = black_format_str
-
-
 def main(*args, **kwargs) -> None:
+    mp.freeze_support()
+
     black.main.help = "Another uncompromising code formatter."
     black.main      = click.version_option(version=__version__)(black.main)
-    patch_format_str()
-    black.patch_click()
     black.main(*args, **kwargs)
 
 

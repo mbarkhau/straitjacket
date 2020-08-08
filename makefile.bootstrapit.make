@@ -302,12 +302,10 @@ lint_isort:
 	@printf "isort ...\n"
 	@$(DEV_ENV)/bin/isort \
 		--check-only \
-		--force-single-line-imports \
-		--length-sort \
-		--recursive \
 		--line-width=$(MAX_LINE_LEN) \
 		--project $(MODULE_NAME) \
-		src/ test/
+		--project sjfmt_vendor \
+		src/$(MODULE_NAME)/*.py test/*.py
 	@printf "\e[1F\e[9C ok\n"
 
 
@@ -320,7 +318,7 @@ lint_sjfmt:
 		--skip-string-normalization \
 		--line-length=$(MAX_LINE_LEN) \
 		--check \
-		src/ test/ 2>&1 | sed "/All done/d" | sed "/left unchanged/d"
+		src/$(MODULE_NAME)/ test/ 2>&1 | sed "/All done/d" | sed "/left unchanged/d"
 	@printf "\e[1F\e[9C ok\n"
 
 
@@ -331,7 +329,7 @@ lint_flake8:
 	@mkdir -p "reports/";
 
 	@printf "flake8 ..\n"
-	@$(DEV_ENV)/bin/flake8 src/ --tee --output-file reports/flake8.txt || exit 0;
+	@$(DEV_ENV)/bin/flake8 src/$(MODULE_NAME)/ --tee --output-file reports/flake8.txt || exit 0;
 	@$(DEV_ENV)/bin/flake8_junit reports/flake8.txt reports/flake8.xml >> /dev/null;
 	@$(DEV_ENV_PY) scripts/exit_0_if_empty.py reports/flake8.txt;
 
@@ -345,7 +343,7 @@ lint_pylint:
 
 	@printf "pylint ..\n";
 	@$(DEV_ENV)/bin/pylint-ignore --rcfile=setup.cfg \
-		src/ test/
+		src/$(MODULE_NAME)/ test/
 	@printf "\e[1F\e[9C ok\n"
 
 
@@ -353,7 +351,7 @@ lint_pylint:
 .PHONY: pylint_ignore
 pylint_ignore:
 	$(DEV_ENV)/bin/pylint-ignore --rcfile=setup.cfg \
-		src/ test/ --update-ignorefile
+		src/$(MODULE_NAME)/ test/ --update-ignorefile
 
 
 ## Run flake8 linter and check for fmt
@@ -371,8 +369,7 @@ mypy:
 	@printf "mypy ....\n"
 	@MYPYPATH=stubs/:vendor/ $(DEV_ENV_PY) -m mypy \
 		--html-report reports/mypycov \
-		--no-error-summary \
-		src/ | sed "/Generated HTML report/d"
+		src/$(MODULE_NAME)/ | sed "/Generated HTML report/d"
 	@printf "\e[1F\e[9C ok\n"
 
 
@@ -424,27 +421,25 @@ test:
 .PHONY: fmt_isort
 fmt_isort:
 	@$(DEV_ENV)/bin/isort \
-		--force-single-line-imports \
-		--length-sort \
-		--recursive \
 		--line-width=$(MAX_LINE_LEN) \
 		--project $(MODULE_NAME) \
-		src/ test/;
+		--project sjfmt_vendor \
+		src/$(MODULE_NAME)/*.py test/*.py
 
 
 ## Run code formatter on src/ and test/
-.PHONY: fmt_sjfmt
-fmt_sjfmt:
+.PHONY: fmt_fmt
+fmt_fmt:
 	@$(DEV_ENV)/bin/sjfmt \
 		--target-version=py36 \
 		--skip-string-normalization \
 		--line-length=$(MAX_LINE_LEN) \
-		src/ test/;
+		src/$(MODULE_NAME) test/;
 
 
 ## Run code formatters
 .PHONY: fmt
-fmt: fmt_isort fmt_sjfmt
+fmt: fmt_isort fmt_fmt
 
 
 ## -- Helpers --
