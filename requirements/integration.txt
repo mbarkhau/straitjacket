@@ -43,7 +43,7 @@ readme_renderer[md]
 twine
 
 md-toc
-git+https://github.com/mbarkhau/straitjacket.git@vendoring-experiment#egg=straitjacket
+git+https://github.com/mbarkhau/straitjacket.git@master#egg=straitjacket
 pycalver
 
 # needed for mypy coverage report
