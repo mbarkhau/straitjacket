@@ -1,6 +1,6 @@
 import black
-import straitjacket.sjfmt as sjfmt
 
+import straitjacket.sjfmt as sjfmt
 
 str_contents = """
 #!/usr/bin/env python3

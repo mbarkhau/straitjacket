@@ -3,11 +3,11 @@
 #
 # Copyright (c) 2018 Manuel Barkhau (mbarkhau@gmail.com) - MIT License
 # SPDX-License-Identifier: MIT
-from straitjacket import sjfmt
-
-import click
 import black
+import click
 import blackd
+
+from straitjacket import sjfmt
 
 
 def main(*args, **kwargs) -> None:

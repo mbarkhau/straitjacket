@@ -10,7 +10,6 @@ import sys
 
 from . import sjfmt
 
-
 # To enable pretty tracebacks:
 #   echo "export ENABLE_BACKTRACE=1;" >> ~/.bashrc
 if os.environ.get('ENABLE_BACKTRACE') == '1':

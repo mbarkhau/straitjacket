@@ -5,12 +5,11 @@
 # SPDX-License-Identifier: MIT
 
 import re
-
 import enum
 import typing as typ
 
-import click
 import black
+import click
 
 __version__ = "v201910.0011-beta"
 
