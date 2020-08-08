@@ -38,12 +38,6 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: echo $PWD
-      run: echo $PWD
-
-    - name: ls
-      run: ls
-
     - name: Cache Virtualenvs
       uses: actions/cache@v1
       with:
@@ -52,6 +46,12 @@ jobs:
 
     - name: make conda
       run: make conda
+
+    - name: make fmt
+      run: make fmt
+
+    - name: git diff
+      run: git diff
 
     - name: make lint
       run: make lint || true
