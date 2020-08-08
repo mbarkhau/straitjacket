@@ -9,6 +9,11 @@
 
 FROM registry.gitlab.com/mbarkhau/bootstrapit/env_builder AS builder
 
+# gcc required for cmarkgfm on python3.8
+# https://github.com/theacodes/cmarkgfm/issues/22
+RUN apt-get update
+RUN apt-get install -y gcc
+
 RUN mkdir /root/.ssh/ && \
     ssh-keyscan gitlab.com >> /root/.ssh/known_hosts && \
     ssh-keyscan registry.gitlab.com >> /root/.ssh/known_hosts
@@ -29,16 +34,13 @@ RUN if ! test -z "${ENV_SSH_PRIVATE_RSA_KEY}"; then \
     ssh-keygen -y -f /root/.ssh/id_rsa > /root/.ssh/id_rsa.pub; \
     fi
 
-RUN apt-get install -y gcc
-
 ADD requirements/ requirements/
 ADD scripts/ scripts/
 
-ADD makefile.extra.make makefile.extra.make
-ADD makefile.config.make makefile.config.make
+ADD makefile.bootstrapit.make makefile.bootstrapit.make
 ADD makefile makefile
 
-RUN make install
+RUN make conda
 
 RUN rm -f /root/.ssh/id_rsa
 
