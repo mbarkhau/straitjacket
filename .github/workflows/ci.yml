@@ -15,9 +15,6 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: echo $PWD
-      run: echo $PWD
-
     - name: Cache Virtualenvs
       uses: actions/cache@v1
       with:
@@ -40,6 +37,12 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+
+    - name: echo $PWD
+      run: echo $PWD
+
+    - name: ls
+      run: ls
 
     - name: Cache Virtualenvs
       uses: actions/cache@v1
