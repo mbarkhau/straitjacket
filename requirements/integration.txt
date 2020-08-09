@@ -19,7 +19,7 @@ flake8-builtins
 flake8-comprehensions
 flake8-junit-report
 pylint
-pylint-ignore
+pylint-ignore>=2020.1013
 mypy
 
 # https://github.com/microsoft/vscode-python/issues/12949
@@ -43,7 +43,7 @@ readme_renderer[md]
 twine
 
 md-toc
-git+https://github.com/mbarkhau/straitjacket.git@master#egg=straitjacket
+git+https://gitlab.com/mbarkhau/straitjacket.git@master#egg=straitjacket
 pycalver
 
 # needed for mypy coverage report

@@ -356,7 +356,7 @@ pylint_ignore:
 
 ## Run flake8 linter and check for fmt
 .PHONY: lint
-lint: lint_isort lint_sjfmt lint_flake8 lint_pylint
+lint: lint_isort lint_fmt lint_flake8 lint_pylint
 
 
 ## Run mypy type checker
@@ -428,18 +428,18 @@ fmt_isort:
 
 
 ## Run code formatter on src/ and test/
-.PHONY: fmt_fmt
-fmt_fmt:
+.PHONY: fmt_sjfmt
+fmt_sjfmt:
 	@$(DEV_ENV)/bin/sjfmt \
 		--target-version=py36 \
 		--skip-string-normalization \
 		--line-length=$(MAX_LINE_LEN) \
-		src/$(MODULE_NAME) test/;
+		src/ test/;
 
 
 ## Run code formatters
 .PHONY: fmt
-fmt: fmt_isort fmt_fmt
+fmt: fmt_isort fmt_sjfmt
 
 
 ## -- Helpers --
@@ -475,6 +475,7 @@ activate:
 	@echo 'export ENV=$${ENV-dev};'
 	@echo 'export PYTHONPATH="src/:vendor/:$$PYTHONPATH";'
 	@echo 'conda activate $(DEV_ENV_NAME);'
+
 	@echo 'function deactivate {'
 	@echo '		if [[ -z $${_env_before_activate} ]]; then'
 	@echo '				export ENV=$${_env_before_activate}; '
@@ -486,6 +487,8 @@ activate:
 	@echo '		else'
 	@echo '				unset PYTHONPATH;'
 	@echo '		fi'
+	@echo '		unset _env_before_activate;'
+	@echo '		unset _pythonpath_before_activate;'
 	@echo '		conda deactivate;'
 	@echo '};'
 
