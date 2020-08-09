@@ -8,37 +8,37 @@ on:
 
 jobs:
 
-  # build-ubuntu:
+  build-ubuntu:
 
-  #   runs-on: ubuntu-latest
+    runs-on: ubuntu-latest
 
-  #   steps:
-  #   - uses: actions/checkout@v2
+    steps:
+    - uses: actions/checkout@v2
 
-  #   - name: Cache Conda Envs
-  #     uses: actions/cache@v2
-  #     with:
-  #       path: |
-  #         ~/miniconda3
-  #         build/*.txt
-  #       key: ${{ runner.OS }}-conda-cache-${{ hashFiles('requirements/**', 'setup.py', 'makefile*') }}
-  #       restore-keys: |
-  #         ${{ runner.OS }}-conda-cache-${{ hashFiles('requirements/**', 'setup.py', 'makefile*') }}
+    - name: Cache Conda Envs
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/miniconda3
+          build/*.txt
+        key: ${{ runner.OS }}-conda-cache-${{ hashFiles('requirements/**', 'setup.py', 'makefile*') }}
+        restore-keys: |
+          ${{ runner.OS }}-conda-cache-${{ hashFiles('requirements/**', 'setup.py', 'makefile*') }}
 
-  #   - name: make conda
-  #     run:
-  #       if [[ -e build/envs.txt ]]; then touch build/envs.txt; fi;
-  #       if [[ -e build/deps.txt ]]; then touch build/deps.txt; fi;
-  #       make conda
+    - name: make conda
+      run:
+        if [[ -e build/envs.txt ]]; then touch build/envs.txt; fi;
+        if [[ -e build/deps.txt ]]; then touch build/deps.txt; fi;
+        make conda
 
-  #   - name: make lint
-  #     run: make lint
+    - name: make lint
+      run: make lint
 
-  #   - name: make mypy
-  #     run: make mypy
+    - name: make mypy
+      run: make mypy
 
-  #   - name: make test
-  #     run: make test
+    - name: make test
+      run: make test
 
   build-macos:
 
@@ -56,18 +56,12 @@ jobs:
         key: ${{ runner.OS }}-conda-cache-${{ hashFiles('requirements/*.txt', 'setup.py', 'makefile*') }}
         restore-keys: |
           ${{ runner.OS }}-conda-cache-${{ hashFiles('requirements/*.txt', 'setup.py', 'makefile*') }}
-          ${{ runner.OS }}-conda-cache-
 
     - name: make conda
       run:
         if [[ -e build/envs.txt ]]; then touch build/envs.txt; fi;
         if [[ -e build/deps.txt ]]; then touch build/deps.txt; fi;
         make conda
-
-    - name: debug
-      run: make freeze
-    - name: debug
-      run: grep pylint requirements/*freeze.txt
 
     - name: make lint
       run: make lint
