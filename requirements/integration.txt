@@ -47,3 +47,4 @@ pycalver
 
 # needed for mypy coverage report
 lxml
+
