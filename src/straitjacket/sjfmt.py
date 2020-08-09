@@ -13,7 +13,7 @@ import click
 
 from sjfmt_vendor import black
 
-__version__ = "v202008.0013"
+__version__ = "v202008.1014"
 
 
 DEBUG_LVL = 0
