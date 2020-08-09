@@ -1,3 +1,10 @@
+<div align="center">
+<p align="center">
+  <img alt="logo" src="https://gitlab.com/mbarkhau/straitjacket/-/raw/master/logo.png">
+</p>
+</div>
+
+
 # [StraitJacket: Another Uncompromising Code Formatter for Python][repo_ref]
 
 StraitJacket is a wrapper around black which implements post
