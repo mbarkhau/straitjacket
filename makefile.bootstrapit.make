@@ -356,7 +356,7 @@ pylint_ignore:
 
 ## Run flake8 linter and check for fmt
 .PHONY: lint
-lint: lint_isort lint_fmt lint_flake8 lint_pylint
+lint: lint_isort lint_sjfmt lint_flake8 lint_pylint
 
 
 ## Run mypy type checker
