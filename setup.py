@@ -34,7 +34,7 @@ setuptools.setup(
     author="Manuel Barkhau",
     author_email="mbarkhau@gmail.com",
     url="https://gitlab.com/mbarkhau/straitjacket",
-    version="202008.12b0",
+    version="202008.13",
     keywords="formatter yapf black pyfmt gofmt",
     description="Another Uncompromising Code Formatter for Python.",
     long_description=long_description,
