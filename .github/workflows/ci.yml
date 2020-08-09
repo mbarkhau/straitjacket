@@ -65,7 +65,9 @@ jobs:
         make conda
 
     - name: debug
-      run: bash -c "source activate;command -v python;python -m pip freeze | grep pylint"
+      run: make freeze
+    - name: debug
+      run: grep pylint requirements/*freeze.txt
 
     - name: make lint
       run: make lint
