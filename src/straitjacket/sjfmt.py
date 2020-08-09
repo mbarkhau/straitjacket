@@ -5,6 +5,7 @@
 # SPDX-License-Identifier: MIT
 
 import re
+import sys
 import enum
 import typing as typ
 import multiprocessing as mp
@@ -609,7 +610,32 @@ def align_formatted_str(src_contents: str) -> FileContent:
     return _realigned_contents(table, cell_groups)
 
 
+IS_FORK_METHOD_AVAILABLE = sys.platform != 'win32'
+
+
+def set_fork_method():
+    # NOTE (mb 2020-08-09): Since we vendor black (and we don't monkey patch),
+    #   we don't require any restriction to the 'fork' method, 'spawn' should
+    #   work just as well. Be aware of this, if you want to return to the
+    #   monkey patching method.
+
+    is_fork_method_setable = (
+        IS_FORK_METHOD_AVAILABLE
+        and hasattr(mp, 'get_start_method')
+        and mp.get_start_method(allow_none=True) is None
+    )
+    # Method 'fork' is the only thing that works for us,
+    #   since we're monkey patching, we need the memory
+    #   state to be preserved.
+    if is_fork_method_setable:
+        # NOTE (mb 2020-08-09): This is actually requred on MacOS,
+        #   on Linux this appears to be the default anyway.
+        #   https://bugs.python.org/issue33725
+        mp.set_start_method('fork')
+
+
 def main(*args, **kwargs) -> None:
+    # set_fork_method()
     mp.freeze_support()
 
     black.main.help = "Another uncompromising code formatter."
