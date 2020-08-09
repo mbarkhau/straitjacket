@@ -434,7 +434,7 @@ fmt_sjfmt:
 		--target-version=py36 \
 		--skip-string-normalization \
 		--line-length=$(MAX_LINE_LEN) \
-		src/ test/;
+		src/$(MODULE_NAME)/ test/;
 
 
 ## Run code formatters
