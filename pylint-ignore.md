@@ -23,95 +23,77 @@ The recommended approach to using `pylint-ignore` is:
 
 # Overview
 
- - [C0411: wrong-import-order (1x)](#c0411-wrong-import-order)
  - [R0911: too-many-return-statements (1x)](#r0911-too-many-return-statements)
  - [R0912: too-many-branches (1x)](#r0912-too-many-branches)
  - [R0914: too-many-locals (1x)](#r0914-too-many-locals)
  - [R0915: too-many-statements (1x)](#r0915-too-many-statements)
 
 
-# C0411: wrong-import-order
-
-## File src/straitjacket/sjfmtd.py - Line 10 - C0411 (wrong-import-order)
-
-- `message: third party import "from straitjacket import sjfmt" should be placed before "from sjfmt_vendor import black"`
-- `author : Manuel Barkhau <mbarkhau@gmail.com>`
-- `date   : 2020-08-08T23:12:46`
-
-```
-   8: from sjfmt_vendor import black
-   9: from sjfmt_vendor import blackd
-> 10: from straitjacket import sjfmt
-  11:
-  12:
-```
-
-
 # R0911: too-many-return-statements
 
-## File src/straitjacket/sjfmt.py - Line 324 - R0911 (too-many-return-statements)
+## File src/straitjacket/sjfmt.py - Line 325 - R0911 (too-many-return-statements)
 
 - `message: Too many return statements (9/6)`
 - `author : Manuel Barkhau <mbarkhau@gmail.com>`
 - `date   : 2020-08-08T12:41:09`
 
 ```
-  322:
   323:
-> 324: def _is_dict_key_symbol_access(col_index: int, tok_cell: Token, row: TokenRow) -> bool:
-  325:     """Determine if the current token is a separator for __getitem__, __setitem__."""
-  326:
+  324:
+> 325: def _is_dict_key_symbol_access(col_index: int, tok_cell: Token, row: TokenRow) -> bool:
+  326:     """Determine if the current token is a separator for __getitem__, __setitem__."""
+  327:
 ```
 
 
 # R0912: too-many-branches
 
-## File src/straitjacket/sjfmt.py - Line 176 - R0912 (too-many-branches)
+## File src/straitjacket/sjfmt.py - Line 177 - R0912 (too-many-branches)
 
 - `message: Too many branches (15/12)`
 - `author : Manuel Barkhau <mbarkhau@gmail.com>`
 - `date   : 2020-08-08T12:41:09`
 
 ```
-  174:
   175:
-> 176: def _tokenize_for_alignment(src_contents: str) -> typ.Iterator[Token]:
-  177:     rest          : str = src_contents
-  178:     prev_rest     : typ.Optional[str] = None
+  176:
+> 177: def _tokenize_for_alignment(src_contents: str) -> typ.Iterator[Token]:
+  178:     rest          : str = src_contents
+  179:     prev_rest     : typ.Optional[str] = None
 ```
 
 
 # R0914: too-many-locals
 
-## File src/straitjacket/sjfmt.py - Line 176 - R0914 (too-many-locals)
+## File src/straitjacket/sjfmt.py - Line 177 - R0914 (too-many-locals)
 
 - `message: Too many local variables (21/20)`
 - `author : Manuel Barkhau <mbarkhau@gmail.com>`
 - `date   : 2020-08-08T12:41:09`
 
 ```
-  174:
   175:
-> 176: def _tokenize_for_alignment(src_contents: str) -> typ.Iterator[Token]:
-  177:     rest          : str = src_contents
-  178:     prev_rest     : typ.Optional[str] = None
+  176:
+> 177: def _tokenize_for_alignment(src_contents: str) -> typ.Iterator[Token]:
+  178:     rest          : str = src_contents
+  179:     prev_rest     : typ.Optional[str] = None
 ```
 
 
 # R0915: too-many-statements
 
-## File src/straitjacket/sjfmt.py - Line 176 - R0915 (too-many-statements)
+## File src/straitjacket/sjfmt.py - Line 177 - R0915 (too-many-statements)
 
 - `message: Too many statements (66/50)`
 - `author : Manuel Barkhau <mbarkhau@gmail.com>`
 - `date   : 2020-08-08T12:41:09`
 
 ```
-  174:
   175:
-> 176: def _tokenize_for_alignment(src_contents: str) -> typ.Iterator[Token]:
-  177:     rest          : str = src_contents
-  178:     prev_rest     : typ.Optional[str] = None
+  176:
+> 177: def _tokenize_for_alignment(src_contents: str) -> typ.Iterator[Token]:
+  178:     rest          : str = src_contents
+  179:     prev_rest     : typ.Optional[str] = None
 ```
 
 
