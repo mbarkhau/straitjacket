@@ -301,6 +301,7 @@ git_hooks:
 lint_isort:
 	@printf "isort ...\n"
 	@$(DEV_ENV)/bin/isort \
+		--recursive \
 		--check-only \
 		--line-width=$(MAX_LINE_LEN) \
 		--project $(MODULE_NAME) \
@@ -310,8 +311,8 @@ lint_isort:
 
 
 ## Run sjfmt with --check
-.PHONY: lint_sjfmt
-lint_sjfmt:
+.PHONY: lint_fmt
+lint_fmt:
 	@printf "sjfmt ...\n"
 	@$(DEV_ENV)/bin/sjfmt \
 		--target-version=py36 \
@@ -356,7 +357,7 @@ pylint_ignore:
 
 ## Run flake8 linter and check for fmt
 .PHONY: lint
-lint: lint_isort lint_sjfmt lint_flake8 lint_pylint
+lint: lint_isort lint_fmt lint_flake8 lint_pylint
 
 
 ## Run mypy type checker
@@ -369,6 +370,7 @@ mypy:
 	@printf "mypy ....\n"
 	@MYPYPATH=stubs/:vendor/ $(DEV_ENV_PY) -m mypy \
 		--html-report reports/mypycov \
+		--no-error-summary \
 		src/$(MODULE_NAME)/ | sed "/Generated HTML report/d"
 	@printf "\e[1F\e[9C ok\n"
 
@@ -402,7 +404,8 @@ test:
 
 	rm -rf build/test_wheel;
 	mkdir -p build/test_wheel;
-	$(DEV_ENV_PY) setup.py bdist_wheel --dist-dir build/test_wheel;
+	$(DEV_ENV_PY) setup.py bdist_wheel --python-tag=py3 \
+		--dist-dir build/test_wheel;
 
 	IFS=' ' read -r -a env_py_paths <<< "$(CONDA_ENV_BIN_PYTHON_PATHS)"; \
 	for i in $${!env_py_paths[@]}; do \
@@ -421,6 +424,7 @@ test:
 .PHONY: fmt_isort
 fmt_isort:
 	@$(DEV_ENV)/bin/isort \
+		--recursive \
 		--line-width=$(MAX_LINE_LEN) \
 		--project $(MODULE_NAME) \
 		--project sjfmt_vendor \
@@ -563,7 +567,7 @@ bump_version:
 .PHONY: dist_build
 dist_build:
 	$(DEV_ENV_PY) setup.py sdist;
-	$(DEV_ENV_PY) setup.py bdist_wheel --python-tag=$(BDIST_WHEEL_PYTHON_TAG);
+	$(DEV_ENV_PY) setup.py bdist_wheel --python-tag=py3;
 	@rm -rf src/*.egg-info
 
 
