@@ -305,7 +305,6 @@ lint_isort:
 		--check-only \
 		--line-width=$(MAX_LINE_LEN) \
 		--project $(MODULE_NAME) \
-		--project sjfmt_vendor \
 		src/$(MODULE_NAME)/*.py test/*.py
 	@printf "\e[1F\e[9C ok\n"
 
