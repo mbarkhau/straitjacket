@@ -1,5 +1,10 @@
 # Changelog for straitjacket
 
+## v202008.1016
+
+- Bugfix: Bad path handling at root level.
+
+
 ## v202008.1015
 
 - Update vendored black to 20.8b1
