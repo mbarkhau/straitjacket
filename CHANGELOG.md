@@ -1,5 +1,10 @@
 # Changelog for straitjacket
 
+## v202008.1015
+
+- Update vendored black to 20.8b1
+
+
 ## v202008.1014
 
 - Vendor black from master
