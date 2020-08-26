@@ -5867,7 +5867,7 @@ def normalize_path_maybe_ignore(
     `report` is where "path ignored" output goes.
     """
     try:
-        normalized_path = path.resolve().relative_to(root).as_posix()
+        normalized_path = path.absolute().resolve().relative_to(root).as_posix()
     except OSError as e:
         report.path_ignored(path, f"cannot be read because {e}")
         return None
