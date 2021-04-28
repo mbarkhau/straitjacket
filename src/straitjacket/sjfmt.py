@@ -14,7 +14,7 @@ import click
 
 from sjfmt_vendor import black
 
-__version__ = "v202104.1017"
+__version__ = "v202104.1018"
 
 
 DEBUG_LVL = 0
