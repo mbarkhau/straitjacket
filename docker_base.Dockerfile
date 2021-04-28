@@ -1,7 +1,7 @@
 # Stages:
 #   root       : Common image, both for the builder and for the final image.
 #                This contains only minimal dependencies required in both cases
-#                for miniconda and the makefile.
+#                for miniconda and the Makefile.
 #   env_builder: stage in which the conda envrionment is created
 #                and dependencies are installed
 #   base       : the final image containing only the required environment files,
@@ -16,8 +16,8 @@ RUN mkdir /root/.ssh/ && \
 ADD requirements/ requirements/
 ADD scripts/ scripts/
 
-ADD makefile.bootstrapit.make makefile.bootstrapit.make
-ADD makefile makefile
+ADD Makefile.bootstrapit.make Makefile.bootstrapit.make
+ADD Makefile Makefile
 
 # install envs (relatively stable)
 ADD requirements/conda.txt requirements/conda.txt

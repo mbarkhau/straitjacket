@@ -57,8 +57,7 @@ CONDA_ENV_BIN_PYTHON_PATHS := \
 empty :=
 literal_space := $(empty) $(empty)
 
-BDIST_WHEEL_PYTHON_TAG := \
-	$(subst python,py,$(subst $(literal_space),.,$(subst .,,$(subst =,,$(SUPPORTED_PYTHON_VERSIONS)))))
+BDIST_WHEEL_PYTHON_TAG := py3
 
 SDIST_FILE_CMD = ls -1t dist/*.tar.gz | head -n 1
 
@@ -182,7 +181,7 @@ help:
 				helpMessage = ""; \
 			} \
 		}' \
-		makefile.bootstrapit.make makefile
+		Makefile.bootstrapit.make Makefile
 
 	@if [[ ! -f $(DEV_ENV_PY) ]]; then \
 	echo "Missing python interpreter at $(DEV_ENV_PY) !"; \
@@ -236,7 +235,7 @@ helpverbose:
 				helpMessage = ""; \
 			} \
 		}' \
-		makefile.bootstrapit.make makefile
+		Makefile.bootstrapit.make Makefile
 
 
 ## -- Project Setup --
@@ -301,11 +300,10 @@ git_hooks:
 lint_isort:
 	@printf "isort ...\n"
 	@$(DEV_ENV)/bin/isort \
-		--recursive \
 		--check-only \
 		--line-width=$(MAX_LINE_LEN) \
 		--project $(MODULE_NAME) \
-		src/$(MODULE_NAME)/*.py test/*.py
+		src/$(MODULE_NAME)/ test/
 	@printf "\e[1F\e[9C ok\n"
 
 
@@ -395,7 +393,7 @@ test:
 		--cov-report term \
 		--html=reports/pytest/index.html \
 		--junitxml reports/pytest.xml \
-		-k "$${PYTEST_FILTER}" \
+		-k "$${PYTEST_FILTER-$${FLTR}}" \
 		$(shell cd src/ && ls -1 */__init__.py | awk '{ sub(/\/__init__.py/, "", $$1); print "--cov "$$1 }') \
 		test/ src/;
 
@@ -403,15 +401,18 @@ test:
 
 	rm -rf build/test_wheel;
 	mkdir -p build/test_wheel;
-	$(DEV_ENV_PY) setup.py bdist_wheel --python-tag=py3 \
+	$(DEV_ENV_PY) setup.py bdist_wheel --python-tag=$(BDIST_WHEEL_PYTHON_TAG) \
 		--dist-dir build/test_wheel;
 
 	IFS=' ' read -r -a env_py_paths <<< "$(CONDA_ENV_BIN_PYTHON_PATHS)"; \
 	for i in $${!env_py_paths[@]}; do \
 		env_py=$${env_py_paths[i]}; \
 		$${env_py} -m pip uninstall --yes $(PKG_NAME); \
-		$${env_py} -m pip install --upgrade build/test_wheel/*.whl; \
-		PYTHONPATH="" ENV=$${ENV-dev} $${env_py} -m pytest test/; \
+		$${env_py} -m pip install --force-reinstall --upgrade build/test_wheel/*.whl; \
+		PYTHONPATH="" ENV=$${ENV-dev} \
+		$${env_py} -m pytest \
+		-k "$${PYTEST_FILTER-$${FLTR}}" \
+		test/; \
 	done;
 
 	@rm -rf ".pytest_cache";
@@ -423,11 +424,9 @@ test:
 .PHONY: fmt_isort
 fmt_isort:
 	@$(DEV_ENV)/bin/isort \
-		--recursive \
 		--line-width=$(MAX_LINE_LEN) \
 		--project $(MODULE_NAME) \
-		--project sjfmt_vendor \
-		src/$(MODULE_NAME)/*.py test/*.py
+		src/$(MODULE_NAME)/ test/;
 
 
 ## Run code formatter on src/ and test/
@@ -522,7 +521,7 @@ devtest:
 		--capture=no \
 		--exitfirst \
 		--failed-first \
-		-k "$${PYTEST_FILTER}" \
+		-k "$${PYTEST_FILTER-$${FLTR}}" \
 		test/ src/;
 
 	@rm -rf "src/__pycache__";
@@ -566,7 +565,7 @@ bump_version:
 .PHONY: dist_build
 dist_build:
 	$(DEV_ENV_PY) setup.py sdist;
-	$(DEV_ENV_PY) setup.py bdist_wheel --python-tag=py3;
+	$(DEV_ENV_PY) setup.py bdist_wheel --python-tag=$(BDIST_WHEEL_PYTHON_TAG);
 	@rm -rf src/*.egg-info
 
 

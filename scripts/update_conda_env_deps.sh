@@ -29,5 +29,5 @@ for i in ${!env_py_paths[@]}; do
 
     ${env_path_python} -m pip install \
         --disable-pip-version-check --upgrade --quiet \
-        "black[d]==19.3b0";
+        "black[d]==21.4b1";
 done;
