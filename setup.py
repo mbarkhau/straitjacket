@@ -42,7 +42,7 @@ setuptools.setup(
     packages=["straitjacket", "sjfmt_vendor"],
     package_dir={"": "src"},
     install_requires=install_requires,
-    extras_require={"d": ["black[d]==19.10b0"]},
+    extras_require={"d": ["black[d]==21.4b1"]},
     entry_points="""
         [console_scripts]
         sjfmt=straitjacket.sjfmt:main
@@ -63,9 +63,7 @@ setuptools.setup(
         "Operating System :: Microsoft :: Windows",
         "Operating System :: MacOS :: MacOS X",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 3.6",
-        "Programming Language :: Python :: 3.7",
-        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3",
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: PyPy",
         "Topic :: Software Development :: Libraries",

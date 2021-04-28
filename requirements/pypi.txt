@@ -7,8 +7,8 @@
 # Binary (non-pure) packages may also be listed here, but you
 # should see if there is a conda package that suits your needs.
 
-# see https://github.com/psf/black/blob/master/setup.py#L70
-black==20.8b1
+# see https://github.com/psf/black/blob/21.4b1/setup.py#L70
+black==21.4b1
 
 regex>=2020.1.8
 dataclasses>=0.6; python_version < '3.7'
