@@ -1,7 +1,7 @@
 # This file is part of the straitjacket project
-# https://gitlab.com/mbarkhau/straitjacket
+# https://github.com/mbarkhau/straitjacket
 #
-# Copyright (c) 2019 Manuel Barkhau (mbarkhau@gmail.com) - MIT License
+# Copyright (c) 2018-2021 Manuel Barkhau (mbarkhau@gmail.com) - MIT License
 # SPDX-License-Identifier: MIT
 
 import os
@@ -33,7 +33,7 @@ setuptools.setup(
     license="MIT",
     author="Manuel Barkhau",
     author_email="mbarkhau@gmail.com",
-    url="https://gitlab.com/mbarkhau/straitjacket",
+    url="https://github.com/mbarkhau/straitjacket",
     version="202104.1017",
     keywords="formatter yapf black pyfmt gofmt",
     description="Another Uncompromising Code Formatter for Python.",

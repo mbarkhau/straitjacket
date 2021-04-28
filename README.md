@@ -187,7 +187,7 @@ ignore =
 ```
 
 
-[repo_ref]: https://gitlab.com/mbarkhau/straitjacket
+[repo_ref]: https://github.com/mbarkhau/straitjacket
 
 [github_build_img]: https://github.com/mbarkhau/straitjacket/workflows/CI/badge.svg
 [github_build_ref]: https://github.com/mbarkhau/straitjacket/actions?query=workflow%3ACI
