@@ -8,7 +8,7 @@
 # should see if there is a conda package that suits your needs.
 
 # see https://github.com/psf/black/blob/21.4b2/setup.py#L70
-black==21.6b0
+black>=21.4b0
 
 regex>=2020.1.8
 dataclasses>=0.6; python_version < '3.7'

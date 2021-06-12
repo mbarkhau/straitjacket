@@ -6,8 +6,8 @@
 
 import click
 
-from sjfmt_vendor import black
-from sjfmt_vendor import blackd
+import black
+import blackd
 from straitjacket import sjfmt
 
 

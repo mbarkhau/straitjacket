@@ -12,7 +12,7 @@ import multiprocessing as mp
 
 import click
 
-from sjfmt_vendor import black
+import black
 
 __version__ = "v202104.1018"
 
