@@ -14,7 +14,7 @@ Project/Repo:
 
 [![MIT License][license_img]][license_ref]
 [![Supported Python Versions][pyversions_img]][pyversions_ref]
-[![CalVer v202104.1018][version_img]][version_ref]
+[![CalVer v202106.1019][version_img]][version_ref]
 [![PyPI Version][pypi_img]][pypi_ref]
 [![PyPI Downloads][downloads_img]][downloads_ref]
 
@@ -213,7 +213,7 @@ ignore =
 [downloads_img]: https://pepy.tech/badge/straitjacket/month
 [downloads_ref]: https://pepy.tech/project/straitjacket
 
-[version_img]: https://img.shields.io/static/v1.svg?label=CalVer&message=v202104.1018&color=blue
+[version_img]: https://img.shields.io/static/v1.svg?label=CalVer&message=v202106.1019&color=blue
 [version_ref]: https://pypi.org/project/bumpver/
 
 [pyversions_img]: https://img.shields.io/pypi/pyversions/straitjacket.svg
