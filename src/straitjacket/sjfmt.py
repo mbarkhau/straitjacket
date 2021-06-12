@@ -8,11 +8,11 @@ import re
 import sys
 import enum
 import typing as typ
+import functools
 import multiprocessing as mp
 
-import click
-
 import black
+import click
 
 __version__ = "v202104.1018"
 
@@ -634,13 +634,48 @@ def set_fork_method():
         mp.set_start_method('fork')
 
 
+PY36_VERSIONS = {
+    black.mode.TargetVersion.PY36,
+    black.mode.TargetVersion.PY37,
+    black.mode.TargetVersion.PY38,
+    black.mode.TargetVersion.PY39,
+}
+
+
+def _mode_override_defaults(mode: black.mode.Mode) -> black.mode.Mode:
+    return black.mode.Mode(
+        target_versions=PY36_VERSIONS,
+        line_length=mode.line_length,
+        string_normalization=False,
+        is_pyi=mode.is_pyi,
+    )
+
+
+original_format_str = black.format_str
+
+
+@functools.wraps(black.format_str)
+def format_str(src_contents: str, *, mode: black.mode.Mode) -> black.FileContent:
+    mode = _mode_override_defaults(mode)
+
+    black_dst_contents = original_format_str(src_contents, mode=mode)
+    sjfmt_dst_contents = align_formatted_str(black_dst_contents)
+    return sjfmt_dst_contents
+
+
 def main(*args, **kwargs) -> None:
     # set_fork_method()
     mp.freeze_support()
+    try:
+        # monkey patch
+        black.format_str = format_str
 
-    black.main.help = "Another uncompromising code formatter."
-    black.main      = click.version_option(version=__version__)(black.main)
-    black.main(*args, **kwargs)
+        black.main.help = "Another uncompromising code formatter."
+        black.main      = click.version_option(version=__version__)(black.main)
+        black.main(*args, **kwargs)
+    finally:
+        # monkey unpatch
+        black.format_str = original_format_str
 
 
 if __name__ == '__main__':

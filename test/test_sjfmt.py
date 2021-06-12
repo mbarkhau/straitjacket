@@ -8,8 +8,9 @@ from __future__ import unicode_literals
 
 import os
 
+import black
+
 import straitjacket.sjfmt as sjfmt
-from sjfmt_vendor import black
 
 STR_CONTENTS = """
 #!/usr/bin/env python3
@@ -133,8 +134,8 @@ def _fmt(code: str) -> str:
 
     line_length   = max(len(line) + 1 for line in code.splitlines())
     mode          = black.FileMode(line_length=line_length)
-    mode          = black._mode_override_defaults(mode)
-    blackend_code = black.original_format_str(code, mode=mode)
+    mode          = sjfmt._mode_override_defaults(mode)
+    blackend_code = sjfmt.original_format_str(code, mode=mode)
     assert blackend_code == code
 
     sjfmt.DEBUG_LVL = 0
