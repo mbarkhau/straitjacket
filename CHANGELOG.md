@@ -1,5 +1,10 @@
 # Changelog for straitjacket
 
+## v202106.1019
+
+- Update vendored black to 21.6b0
+
+
 ## v202104.1018
 
 - Update vendored black to 21.4b2
