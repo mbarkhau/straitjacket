@@ -1,8 +1,14 @@
 # Changelog for straitjacket
 
+## v202107.1020
+
+- Update pinned black to 21.7b0
+
+
 ## v202106.1019
 
-- Update vendored black to 21.6b0
+- Remove vendored black (monkey patch instead)
+- Update pinned black to 21.6b0
 
 
 ## v202104.1018
