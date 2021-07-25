@@ -10,7 +10,7 @@ import os
 
 import black
 
-import straitjacket.sjfmt as sjfmt
+from straitjacket import sjfmt
 
 STR_CONTENTS = """
 #!/usr/bin/env python3
