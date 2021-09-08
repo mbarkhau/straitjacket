@@ -7,10 +7,10 @@
 # Binary (non-pure) packages may also be listed here, but you
 # should see if there is a conda package that suits your needs.
 
-# see https://github.com/psf/black/blob/21.7b0/setup.py#L74
-black>=21.7b0
+# see https://github.com/psf/black/blob/21.8b0/setup.py#L74
+black>=21.8b0
 
 regex>=2020.1.8
 dataclasses>=0.6; python_version < '3.7'
-typing_extensions>=3.7.4
+typing_extensions>=3.10.0.0
 mypy_extensions>=0.4.3
