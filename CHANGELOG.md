@@ -1,5 +1,10 @@
 # Changelog for straitjacket
 
+## v202108.1021
+
+- Update pinned black to 21.8b0
+
+
 ## v202107.1020
 
 - Update pinned black to 21.7b0
