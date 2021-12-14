@@ -4,6 +4,6 @@
 # Copyright (c) 2018-2021 Manuel Barkhau (mbarkhau@gmail.com) - MIT License
 # SPDX-License-Identifier: MIT
 
-__version__ = "v202109.1022"
+__version__ = "v202112.1023"
 
 from . import sjfmt  # noqa
