@@ -42,7 +42,7 @@ setuptools.setup(
     packages=["straitjacket"],
     package_dir={"": "src"},
     install_requires=install_requires,
-    extras_require={"d": ["black[d]>=21.12b0"]},
+    extras_require={"d": ["black[d]>=22.1"]},
     entry_points="""
         [console_scripts]
         sjfmt=straitjacket.sjfmt:main
