@@ -2,11 +2,12 @@
 
 ## v202201.1024
 
-- Update pinned black to 22.1
+- Update pinned black==21.12b0
+
 
 ## v202112.1023
 
-- Update pinned black to 21.12b0
+- Update pinned black>=21.12b0
 
 
 ## v202109.1022

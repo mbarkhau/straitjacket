@@ -639,6 +639,7 @@ PY36_VERSIONS = {
     black.mode.TargetVersion.PY37,
     black.mode.TargetVersion.PY38,
     black.mode.TargetVersion.PY39,
+    black.mode.TargetVersion.PY310,
 }
 
 
@@ -670,7 +671,7 @@ def main(*args, **kwargs) -> None:
         # monkey patch
         black.format_str = format_str
 
-        black.main.help = "Another uncompromising code formatter."
+        black.main.help = "The aligning code formatter."
         black.main      = click.version_option(version=__version__)(black.main)
         black.main(*args, **kwargs)
     finally:

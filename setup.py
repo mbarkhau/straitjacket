@@ -35,14 +35,14 @@ setuptools.setup(
     author_email="mbarkhau@gmail.com",
     url="https://github.com/mbarkhau/straitjacket",
     version="202112.1023",
-    keywords="formatter yapf black pyfmt gofmt",
-    description="Another Uncompromising Code Formatter for Python.",
+    keywords="formatter yapf black pyfmt align",
+    description="The Aligning Code Formatter for Python.",
     long_description=long_description,
     long_description_content_type="text/markdown",
     packages=["straitjacket"],
     package_dir={"": "src"},
     install_requires=install_requires,
-    extras_require={"d": ["black[d]>=22.1"]},
+    extras_require={"d": ["black[d]==21.12b0"]},
     entry_points="""
         [console_scripts]
         sjfmt=straitjacket.sjfmt:main
