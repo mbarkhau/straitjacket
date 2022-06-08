@@ -1,5 +1,14 @@
 # Changelog for straitjacket
 
+## v202206.1026
+
+- Update pinned black==21.12b0
+
+Unfortunately we depend on the ability to monkey-patch
+`black.format_str`. Due to mypyc compilation, this no longer
+works, starting with `black==22.1.0`.
+
+
 ## v202206.1025
 
 - Update pinned black==22.3.0
