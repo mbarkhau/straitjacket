@@ -34,7 +34,7 @@ setuptools.setup(
     author="Manuel Barkhau",
     author_email="mbarkhau@gmail.com",
     url="https://github.com/mbarkhau/straitjacket",
-    version="202202.1024",
+    version="202206.1025",
     keywords="formatter yapf black pyfmt align",
     description="The Aligning Code Formatter for Python.",
     long_description=long_description,
