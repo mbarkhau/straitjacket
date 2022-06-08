@@ -20,6 +20,7 @@ flake8-comprehensions
 flake8-junit-report
 flake8-2020
 pylint-ignore>=2020.1013
+pylint<2.13
 mypy>=0.790
 isort
 
