@@ -14,7 +14,7 @@ import multiprocessing as mp
 import black
 import click
 
-__version__ = "v202206.1025"
+__version__ = "v202206.1026"
 
 
 DEBUG_LVL = 0
