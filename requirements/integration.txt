@@ -39,7 +39,7 @@ readme_renderer[md]
 twine
 
 md-toc
-black==21.12b0
+black==24.3.0
 straitjacket==202202.1024
 # git+https://gitlab.com/mbarkhau/straitjacket.git@master#egg=straitjacket
 bumpver
